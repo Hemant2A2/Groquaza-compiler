@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "reader/CodeLoc.hpp"
+
 enum TokenType {
     OPEN_PAREN,         //  (
     CLOSE_PAREN,        //  )
@@ -24,12 +26,12 @@ enum TokenType {
     LESS,               //  <
     LESS_EQUAL,         //  <=    
     IDENTIFIER,         //  string, int, float, etc
-    TYPE_STRING,        //  "string"
-    TYPE_INTEGER,       //  5
-    TYPE_FLOAT,         //  5.5
-    STRING_LIT,         //  string
-    INTEGER_LIT,        //  int
-    FLOAT_LIT,          //  float
+    STRING_LIT,         //  "string"
+    INTEGER_LIT,        //  5
+    FLOAT_LIT,          //  5.5
+    TYPE_STRING,        //  string
+    TYPE_INTEGER,       //  int
+    TYPE_FLOAT,         //  float
     AND,                //  and
     ELSE,               //  else
     ELIF,               //  elif
@@ -44,4 +46,13 @@ enum TokenType {
     WHILE,              //  while
     END_OF_FILE,        //  EOF
     INVALID
+};
+
+struct Token {
+    TokenType type;
+    std::string lexeme;
+    CodeLoc codeLoc;
+
+    Token(TokenType type) : type(type) {}
+    Token(TokenType type, const std::string &lexeme, const CodeLoc &codeLoc) : type(type), lexeme(lexeme), codeLoc(codeLoc) {}
 };
