@@ -5,6 +5,11 @@
 
 Lexer::Lexer() {
     nextToken();
+
+    // // Uncomment this to test Lexing
+    // while (getToken().type != END_OF_FILE) {
+    //     nextToken();
+    // }
 }
 
 const Token &Lexer::getToken() const {
@@ -44,6 +49,7 @@ Token Lexer::consumeToken() {
         std::stringstream ss;
         ss << currChar;
         reader.nextChar();
+        currChar = reader.getChar();
         while(isalnum(currChar) && !reader.isEOF()) {
             ss << currChar;
             reader.nextChar();
@@ -89,6 +95,7 @@ Token Lexer::consumeToken() {
         std::stringstream num_stream;
         num_stream << currChar;
         reader.nextChar();
+        currChar = reader.getChar();
         while(isdigit(currChar) && !reader.isEOF()) {
             num_stream << currChar;
             reader.nextChar();

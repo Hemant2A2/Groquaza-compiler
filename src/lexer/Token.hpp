@@ -25,7 +25,7 @@ enum TokenType {
     GREATER_EQUAL,      //  >=
     LESS,               //  <
     LESS_EQUAL,         //  <=    
-    IDENTIFIER,         //  string, int, float, etc
+    IDENTIFIER,         //  variable
     STRING_LIT,         //  "string"
     INTEGER_LIT,        //  5
     FLOAT_LIT,          //  5.5
