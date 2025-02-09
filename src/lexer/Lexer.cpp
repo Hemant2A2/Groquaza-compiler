@@ -103,6 +103,7 @@ Token Lexer::consumeToken() {
         if(currChar == '.') {
             num_stream << currChar;
             reader.nextChar();
+            currChar = reader.getChar();
             while(isdigit(currChar) && !reader.isEOF()) {
                 num_stream << currChar;
                 reader.nextChar();
