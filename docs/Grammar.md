@@ -7,9 +7,9 @@
            | <addExp>
 <addExp> ::= IDENTIFIER (PLUS | MINUS) IDENTIFIER
 <binaryOp> ::= IDENTIFIER <comparison> IDENTIFIER
-<comparison> ::= NOT_EQUAL | COMPARE | GREATER | GREATER_EQUAL | LESS | LESS_EQUAL
+<comparison> ::= NOT_EQUAL | EQUAL | GREATER | GREATER_EQUAL | LESS | LESS_EQUAL
 <keyword> ::= IF | ELIF | ELSE
-<dataType> ::= TYPE_STRING | TYPE_INT | TYPE_FLOAT
-<literal> ::= STRING_LIT | INT_LIT | FLOAT_LIT
+<dataType> ::= TYPE_STRING | TYPE_INTEGER | TYPE_FLOAT
+<literal> ::= STRING_LIT | INTEGER_LIT | FLOAT_LIT
 
 ```

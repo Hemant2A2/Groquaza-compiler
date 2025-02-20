@@ -155,7 +155,7 @@ Token Lexer::consumeToken() {
         case '=':
             if(reader.getChar() == '=' && !reader.isEOF()) {
                 reader.nextChar();
-                return Token(COMPARE, "==", reader.getCodeLoc());
+                return Token(EQUAL, "==", reader.getCodeLoc());
             }
             return Token(ASSIGN, "=", reader.getCodeLoc());
         case '>':
