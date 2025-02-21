@@ -40,7 +40,8 @@ class StartNode: public Node {
 public:
     using Node::Node;
 
-    std::vector<StatementNode *> statements() {
+    // https://stackoverflow.com/questions/76489630/explanation-of-nodiscard-in-c17
+    [[nodiscard]] std::vector<StatementNode *> statements() {
         return getChildren<StatementNode>();
     }
 };

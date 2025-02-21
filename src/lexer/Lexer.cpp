@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <assert.h>
 
 Lexer::Lexer() {
     nextToken();
@@ -26,6 +27,11 @@ void Lexer::nextToken() {
 
 bool Lexer::isEOF() const {
     return reader.isEOF();
+}
+
+void Lexer::expect(TokenType expType) {
+    assert(getToken().type == expType);
+    nextToken();
 }
 
 CodeLoc Lexer::getCodeLoc() const {

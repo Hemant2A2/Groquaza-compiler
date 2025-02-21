@@ -15,6 +15,7 @@ public:
     void nextToken();
     CodeLoc getCodeLoc() const;
     bool isEOF() const;
+    void expect(TokenType expType);
     void printTokens() const;
 
 private:
