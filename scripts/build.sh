@@ -3,7 +3,7 @@
 PROJECT_DIR="/Users/hemantayuj/Desktop/compiler/Groquaza/src"
 COMPILER="g++-14"
 STD_VERSION="-std=c++20"
-SRC_FILES="main.cpp lexer/Lexer.cpp lexer/reader/Reader.cpp lexer/reader/CodeLoc.cpp"
+SRC_FILES="main.cpp lexer/Lexer.cpp lexer/reader/Reader.cpp lexer/reader/CodeLoc.cpp parser/Parser.cpp ast/PrintAST.cpp"
 OUTPUT="main"
 
 cd "$PROJECT_DIR" || exit

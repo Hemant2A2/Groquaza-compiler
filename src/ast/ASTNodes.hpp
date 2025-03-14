@@ -4,9 +4,19 @@
 #include <vector>
 #include "../lexer/reader/Reader.hpp"
 
+class StatementNode;
+class KeywordNode;
+class BinaryOpNode;
+class ExpNode;
+class AddExpNode;
+class ComparisonNode;
+class DataTypeNode;
+class LiteralNode;
+
 class Node {
 public:
     Node(Node *parent, CodeLoc codeloc) : parent(parent), codeloc(std::move(codeloc)) {}
+    virtual ~Node() {}
     Node(const Node &) = delete;
 
     template<typename T>
@@ -71,6 +81,8 @@ public:
 class ExpNode: public Node {
 public:
     using Node::Node;
+    std::string lhs_identifier;
+    std::string rhs_identifier;
 
     AddExpNode *addExp() {
         return getChild<AddExpNode>();
@@ -88,6 +100,13 @@ public:
 
 class AddExpNode: public Node {
 public:
+    using Node::Node;
+    LiteralNode *literal() {
+        return getChild<LiteralNode>();
+    }
+
+    std::string left_identifier;
+    std::string right_identifier;
     enum AddOp: int {
         NONE_OP,
         PLUS_OP,
@@ -99,6 +118,8 @@ public:
 class BinaryOpNode: public Node {
 public:
     using Node::Node;
+    std::string left_identifier;
+    std::string right_identifier;
 
     ComparisonNode *comparison() {
         return getChild<ComparisonNode>();
@@ -107,6 +128,7 @@ public:
 
 class ComparisonNode: public Node {
 public:
+    using Node::Node;
     enum Comparison: int {
         NONE_COMP,
         GREATER_COMP,
@@ -122,6 +144,7 @@ public:
 
 class KeywordNode: public Node {
 public:
+    using Node::Node;
     enum Keyword: int {
         NONE_KEY,
         IF_KEY,
@@ -133,6 +156,7 @@ public:
 
 class DataTypeNode: public Node {
 public:
+    using Node::Node;
     enum DataType: int {
         NONE_TYPE,
         INT_TYPE,
@@ -144,6 +168,7 @@ public:
 
 class LiteralNode: public Node {
 public:
+    using Node::Node;
     enum Literal: int {
         NONE_LITERAL,
         INT_LITERAL,
@@ -151,5 +176,6 @@ public:
         STRING_LITERAL,
     };
     Literal literal = NONE_LITERAL;
+    std::string value;
 };
 

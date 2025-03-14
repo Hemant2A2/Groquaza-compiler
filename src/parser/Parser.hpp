@@ -22,6 +22,7 @@ public:
 private:
     Lexer &lexer;
     std::stack<Node *> nodeStack;
+    std::vector<std::unique_ptr<Node>> astNodes;
 
     template<typename T> T *createNode();
     template<typename T> T *endNode(T *node);

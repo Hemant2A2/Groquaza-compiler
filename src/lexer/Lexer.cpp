@@ -30,6 +30,13 @@ bool Lexer::isEOF() const {
 }
 
 void Lexer::expect(TokenType expType) {
+    const Token &curr = getToken();
+    if (curr.type != expType) {
+        std::cerr << "Lexer::expect() failed: Expected token type " << expType
+                  << " but got token type " << curr.type
+                  << " with lexeme '" << curr.lexeme << "' at "
+                  << "line " << curr.codeLoc.line << ", column " << curr.codeLoc.column << "\n";
+    }
     assert(getToken().type == expType);
     nextToken();
 }
