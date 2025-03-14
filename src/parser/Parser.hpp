@@ -12,7 +12,7 @@ public:
     StartNode *parse();
     StatementNode *parseStatement();
     ExpNode *parseExp();
-    AddExpNode *parseAddExp();
+    AddExpNode *parseAddExp(Token lhs_token);
     BinaryOpNode *parseBinaryOp();
     ComparisonNode *parseComparison();
     KeywordNode *parseKeyword();

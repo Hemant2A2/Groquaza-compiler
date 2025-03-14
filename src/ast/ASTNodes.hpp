@@ -4,6 +4,7 @@
 #include <vector>
 #include "../lexer/reader/Reader.hpp"
 #include <iostream>
+#include "../lexer/Token.hpp"
 
 class StatementNode;
 class KeywordNode;
@@ -84,6 +85,7 @@ public:
     using Node::Node;
     std::string lhs_identifier;
     std::string rhs_identifier;
+    TokenType op_type;
 
     AddExpNode *addExp() {
         return getChild<AddExpNode>();
