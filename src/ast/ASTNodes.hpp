@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "../lexer/reader/Reader.hpp"
+#include <iostream>
 
 class StatementNode;
 class KeywordNode;

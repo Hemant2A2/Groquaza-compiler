@@ -81,11 +81,7 @@ static std::string nodeToString(Node* node) {
             case LiteralNode::STRING_LITERAL: result += " (string)"; break;
             default: break;
         }
-        if (!lit->value.empty()) {
-            result += " [Value: " + lit->value + "]";
-        } else {
-            result += " [Value: (empty)]";
-        }
+        result += " [Value: " + lit->value + "]";
         return result;
     }
     return "Unknown Node";

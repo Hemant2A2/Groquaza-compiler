@@ -42,28 +42,27 @@ ExpNode *Parser::parseExp() {
        
         auto lit = parseLiteral();
         if(lit != nullptr) {
-            expNode->addChild(lit);
+            // expNode->addChild(lit);
         } else if(lexer.getToken().type == IDENTIFIER) {
             Token rhs_token = lexer.getToken();
             std::cout << "rhs_token: " << rhs_token.lexeme << std::endl;
             lexer.nextToken();
             Token nextToken = lexer.getToken();
             if (nextToken.type == PLUS || nextToken.type == MINUS) {
-                // It's an additive expression, so parse it.
                 AddExpNode *addExp = parseAddExp();
-                expNode->addChild(addExp);
+                // expNode->addChild(addExp);
             } else {
                 expNode->rhs_identifier = rhs_token.lexeme;
             }
         } else {
             AddExpNode *addExp = parseAddExp();
-            expNode->addChild(addExp);
+            // expNode->addChild(addExp);
         }
     } else if(lexer.getToken().type == RETURN) {
         lexer.nextToken();
         auto lit = parseLiteral();
         if(lit != nullptr) {
-            expNode->addChild(lit);
+            // expNode->addChild(lit);
         } else {
             Token iden_token = lexer.getToken();
             std::cout << "iden_token: " << iden_token.lexeme << std::endl;
@@ -79,7 +78,7 @@ AddExpNode *Parser::parseAddExp() {
     AddExpNode *addExpNode = createNode<AddExpNode>();
     auto left_lit = parseLiteral();
     if(left_lit != nullptr) {
-        addExpNode->addChild(left_lit);
+        // addExpNode->addChild(left_lit);
     } else if(lexer.getToken().type == IDENTIFIER) {
         Token lhs_token = lexer.getToken();
         std::cout << "lhs_token:(in add exp) " << lhs_token.lexeme << std::endl;
@@ -95,7 +94,7 @@ AddExpNode *Parser::parseAddExp() {
     
     auto right_lit = parseLiteral();
     if(right_lit != nullptr) {
-        addExpNode->addChild(right_lit);
+        // addExpNode->addChild(right_lit);
     } else if(lexer.getToken().type == IDENTIFIER) {
         Token rhs_token = lexer.getToken();
         std::cout << "rhs_token:(in add exp) " << rhs_token.lexeme << std::endl;
@@ -110,7 +109,7 @@ BinaryOpNode *Parser::parseBinaryOp() {
     Token token = lexer.getToken();
     auto left_lit = parseLiteral();
     if(left_lit != nullptr) {
-        binaryOpNode->addChild(left_lit);
+        // binaryOpNode->addChild(left_lit);
     } else if(token.type == IDENTIFIER) {
         binaryOpNode->left_identifier = token.lexeme;
         lexer.nextToken();
@@ -120,7 +119,7 @@ BinaryOpNode *Parser::parseBinaryOp() {
     token = lexer.getToken();
     auto right_lit = parseLiteral();
     if(right_lit != nullptr) {
-        binaryOpNode->addChild(right_lit);
+        // binaryOpNode->addChild(right_lit);
     } else if(token.type == IDENTIFIER) {
         binaryOpNode->right_identifier = token.lexeme;
         lexer.nextToken();
