@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
 
 #include "Token.hpp"
 #include "reader/Reader.hpp"
@@ -9,7 +10,7 @@
 
 class Lexer {
 public:
-    Lexer();
+    Lexer(std::filesystem::path &filePath);
 
     const Token &getToken() const;
     void nextToken();
@@ -19,7 +20,7 @@ public:
     void printTokens() const;
 
 private:
-    Reader reader = Reader("/Users/hemantayuj/Desktop/compiler/Groquaza/tests/eval.blu"); // TODO: Change this to take in a file path
+    Reader reader;
     Token currToken = Token(INVALID);
     std::vector<Token> tokens;
 

@@ -4,9 +4,8 @@
 #include <sstream>
 #include <assert.h>
 
-Lexer::Lexer() {
+Lexer::Lexer(std::filesystem::path &filePath) : reader(filePath) {
     nextToken();
-
     // // Uncomment this to test Lexing
     // while (getToken().type != END_OF_FILE) {
     //     nextToken();
