@@ -19,7 +19,7 @@ public:
     void printTokens() const;
 
 private:
-    Reader reader = Reader("/Users/hemantayuj/Desktop/compiler/Groquaza/tests/eval.blu"); // TODO: Change this to take in a file path
+    Reader reader = Reader("/Users/hemantayuj/Desktop/compiler/Groquaza/tests/start.blu"); // TODO: Change this to take in a file path
     Token currToken = Token(INVALID);
     std::vector<Token> tokens;
 

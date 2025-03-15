@@ -3,6 +3,7 @@
 
 #include "./Parser.hpp"
 #include "../lexer/Lexer.hpp"
+#include "../lexer/Token.hpp"
 
 StartNode *Parser::parse() {
     StartNode *startNode = createNode<StartNode>();
@@ -14,10 +15,13 @@ StartNode *Parser::parse() {
 
 StatementNode *Parser::parseStatement() {
     StatementNode *statementNode = createNode<StatementNode>();
-    if(parseKeyword() != nullptr) {
-        lexer.expect(OPEN_PAREN);
-        parseBinaryOp();
-        lexer.expect(CLOSE_PAREN);
+    KeywordNode *keyword = parseKeyword();
+    if(keyword != nullptr) {
+        if(keyword->keyword != KeywordNode::ELSE_KEY) {
+            lexer.expect(OPEN_PAREN);
+            parseBinaryOp();
+            lexer.expect(CLOSE_PAREN);
+        }
         lexer.expect(OPEN_BRACE);
         while(lexer.getToken().type != CLOSE_BRACE) {
             parseExp();
@@ -100,16 +104,18 @@ BinaryOpNode *Parser::parseBinaryOp() {
     if(left_lit != nullptr) {
         // binaryOpNode->addChild(left_lit);
     } else if(token.type == IDENTIFIER) {
+        std::cout << "left iden " << token.lexeme << std::endl;
         binaryOpNode->left_identifier = token.lexeme;
         lexer.nextToken();
     }
     ComparisonNode *comp = parseComparison();
-    binaryOpNode->addChild(comp);
+    // binaryOpNode->addChild(comp);
     token = lexer.getToken();
     auto right_lit = parseLiteral();
     if(right_lit != nullptr) {
         // binaryOpNode->addChild(right_lit);
     } else if(token.type == IDENTIFIER) {
+        std::cout << "right iden " << token.lexeme << std::endl;
         binaryOpNode->right_identifier = token.lexeme;
         lexer.nextToken();
     }
