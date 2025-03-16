@@ -11,7 +11,7 @@ int main() {
     Parser parser(lex);
     StartNode *startNode = parser.parse();
     printAST(startNode);
-    CodeGenerator codeGen("output.s");
+    CodeGenerator codeGen("output_eval.s");
     codeGen.generateAssembly(startNode);
     return 0;
 }

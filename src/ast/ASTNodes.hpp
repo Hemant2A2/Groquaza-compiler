@@ -67,7 +67,7 @@ public:
     }
 
     BinaryOpNode *binaryOp() {
-        return getChild<BinaryOpNode>();
+        return getChild<BinaryOpNode>(1);
     }
 
     ExpNode *exp() {
