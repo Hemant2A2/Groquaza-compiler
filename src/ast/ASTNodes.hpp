@@ -153,6 +153,7 @@ public:
         IF_KEY,
         ELIF_KEY,
         ELSE_KEY,
+        WHILE_KEY,
     };
     Keyword keyword = NONE_KEY;
 };

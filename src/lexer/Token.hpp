@@ -20,7 +20,7 @@ enum TokenType {
     NOT,                //  !
     NOT_EQUAL,          //  !=
     ASSIGN,             //  =    
-    EQUAL,            //  ==
+    EQUAL,              //  ==
     GREATER,            //  >
     GREATER_EQUAL,      //  >=
     LESS,               //  <

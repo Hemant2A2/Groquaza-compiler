@@ -111,6 +111,7 @@ Token Lexer::consumeToken() {
         while(isdigit(currChar) && !reader.isEOF()) {
             num_stream << currChar;
             reader.nextChar();
+            currChar = reader.getChar();
         }
         if(currChar == '.') {
             num_stream << currChar;
@@ -119,6 +120,7 @@ Token Lexer::consumeToken() {
             while(isdigit(currChar) && !reader.isEOF()) {
                 num_stream << currChar;
                 reader.nextChar();
+                currChar = reader.getChar();
             }
             return Token(FLOAT_LIT, num_stream.str(), reader.getCodeLoc());
         }

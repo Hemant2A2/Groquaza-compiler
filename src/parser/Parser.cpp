@@ -37,11 +37,22 @@ StatementNode *Parser::parseStatement() {
 ExpNode *Parser::parseExp() {
     ExpNode *expNode = createNode<ExpNode>();
 
-    if(parseDataType() != nullptr) {
+    auto dtNode = parseDataType();
+    if(dtNode != nullptr) {
+        std::string typeStr;
+        switch(dtNode->dataType) {
+            case DataTypeNode::INT_TYPE:    typeStr = "int"; break;
+            case DataTypeNode::FLOAT_TYPE:  typeStr = "float"; break;
+            case DataTypeNode::STRING_TYPE: typeStr = "string"; break;
+            default: typeStr = "unknown"; break;
+        }
         Token lhs_token = lexer.getToken();
         std::cout << "lhs_token: " << lhs_token.lexeme << std::endl;
         lexer.expect(IDENTIFIER);
         expNode->lhs_identifier = lhs_token.lexeme;
+        if(!symbolTable.addSymbol(lhs_token.lexeme, typeStr)) {
+            std::cerr << "Error: Variable " << lhs_token.lexeme << " redeclared." << std::endl;
+        }
         lexer.expect(ASSIGN);
        
         auto lit = parseLiteral();
@@ -55,6 +66,29 @@ ExpNode *Parser::parseExp() {
             if (nextToken.type == PLUS || nextToken.type == MINUS) {
                 AddExpNode *addExp = parseAddExp(rhs_token);
                 // expNode->addChild(addExp);
+            } else {
+                expNode->rhs_identifier = rhs_token.lexeme;
+            }
+        }
+    } else if(lexer.getToken().type == IDENTIFIER) {
+        Token varToken = lexer.getToken();
+        SymbolInfo info;
+        if(!symbolTable.lookup(varToken.lexeme, info)) {
+            std::cerr << "Error: Variable " << varToken.lexeme << " not declared." << std::endl;
+        }
+        expNode->lhs_identifier = varToken.lexeme;
+        lexer.nextToken();
+        lexer.expect(ASSIGN);
+        auto lit = parseLiteral();
+        if(lit != nullptr) {
+            // expNode->addChild(lit);
+        } else if(lexer.getToken().type == IDENTIFIER) {
+            Token rhs_token = lexer.getToken();
+            std::cout << "rhs_token: " << rhs_token.lexeme << std::endl;
+            lexer.nextToken();
+            Token nextToken = lexer.getToken();
+            if(nextToken.type == PLUS || nextToken.type == MINUS) {
+                AddExpNode *addExp = parseAddExp(rhs_token);
             } else {
                 expNode->rhs_identifier = rhs_token.lexeme;
             }
@@ -161,7 +195,7 @@ ComparisonNode *Parser::parseComparison() {
 
 KeywordNode *Parser::parseKeyword() {
     Token token = lexer.getToken();
-    if (token.type != IF && token.type != ELSE && token.type != ELIF) {
+    if (token.type != IF && token.type != ELSE && token.type != ELIF && token.type != WHILE) {
         return nullptr;
     }
 
@@ -177,6 +211,9 @@ KeywordNode *Parser::parseKeyword() {
             break;
         case ELIF:
             keywordNode->keyword = KeywordNode::ELIF_KEY;
+            break;
+        case WHILE:
+            keywordNode->keyword = KeywordNode::WHILE_KEY;
             break;
         default:
             break;
@@ -251,4 +288,8 @@ T *Parser::endNode(T *node) {
     assert(node == nodeStack.top());
     nodeStack.pop();
     return node;
+}
+
+SymbolTable &Parser::getSymbolTable() {
+    return symbolTable;
 }

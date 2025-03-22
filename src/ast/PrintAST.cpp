@@ -59,6 +59,7 @@ static std::string nodeToString(Node* node) {
             case KeywordNode::IF_KEY:    result += " (if)"; break;
             case KeywordNode::ELIF_KEY:  result += " (elif)"; break;
             case KeywordNode::ELSE_KEY:  result += " (else)"; break;
+            case KeywordNode::WHILE_KEY: result += " (while)"; break;
             default: break;
         }
         return result;

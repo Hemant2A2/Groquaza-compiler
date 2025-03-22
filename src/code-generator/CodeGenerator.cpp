@@ -2,12 +2,14 @@
 #include <sstream>
 #include <iostream>
 
-int CodeGenerator::getVariableOffset(const std::string &var) {
-    if (var == "a") return 0;
-    else if (var == "b") return 4;
-    else if (var == "c") return 8;
-    return 12;
+CodeGenerator::CodeGenerator(const std::string &outputFile, SymbolTable &symTab)
+    : emitter(outputFile), symbolTable(symTab)
+{
+    emitter.emitLine(".global _start");
+    emitter.emitLabel("_start");
 }
+
+CodeGenerator::~CodeGenerator() {}
 
 std::string CodeGenerator::getUniqueLabel(const std::string &base) {
     std::ostringstream oss;
@@ -15,14 +17,14 @@ std::string CodeGenerator::getUniqueLabel(const std::string &base) {
     return oss.str();
 }
 
-CodeGenerator::CodeGenerator(const std::string &outputFile)
-    : emitter(outputFile)
-{
-    emitter.emitLine(".global _start");
-    emitter.emitLabel("_start");
+int CodeGenerator::getVariableOffset(const std::string &var) {
+    SymbolInfo info;
+    if (symbolTable.lookup(var, info)) {
+        return info.offset;
+    }
+    std::cerr << "Error: Variable " << var << " not declared." << std::endl;
+    return -1;
 }
-
-CodeGenerator::~CodeGenerator() {}
 
 void CodeGenerator::generateAssembly(StartNode *root) {
     std::vector<StatementNode*> stmts = root->statements();
@@ -32,6 +34,9 @@ void CodeGenerator::generateAssembly(StartNode *root) {
             (stmt->keyword()->keyword == KeywordNode::IF_KEY ||
              stmt->keyword()->keyword == KeywordNode::ELIF_KEY)) {
             generateIfElseChain(stmts, i);
+        } else if(stmt->keyword() != nullptr &&
+                  stmt->keyword()->keyword == KeywordNode::WHILE_KEY) {
+            generateWhile(stmt);
         } else {
             generateStatementNode(stmt);
         }
@@ -91,6 +96,34 @@ void CodeGenerator::generateIfElseChain(const std::vector<StatementNode*> &stmts
     }
     emitter.emitLabel(endLabel);
 }
+
+void CodeGenerator::generateWhile(StatementNode *node) {
+    std::string loopStart = getUniqueLabel("while_start");
+    std::string loopEnd = getUniqueLabel("while_end");
+
+    emitter.emitLabel(loopStart);
+
+    BinaryOpNode *cond = node->binaryOp();
+    if (!cond) {
+        std::cerr << "Error: while condition is not a binary operation" << std::endl;
+        return;
+    }
+    int offsetL = getVariableOffset(cond->left_identifier);
+    int offsetR = getVariableOffset(cond->right_identifier);
+    emitter.emitInstruction("ldr", "w1, [sp, #" + std::to_string(offsetL) + "]", "Load " + cond->left_identifier);
+    emitter.emitInstruction("ldr", "w2, [sp, #" + std::to_string(offsetR) + "]", "Load " + cond->right_identifier);
+    emitter.emitInstruction("cmp", "w1, w2", "Compare condition");
+   // For a while loop like "while (i <= 10)", exit if i > 10.
+    emitter.emitInstruction("b.gt", loopEnd, "Exit loop if condition false");
+
+    std::vector<ExpNode*> bodyExps = node->exps();
+    for (auto exp : bodyExps) {
+        generateExpNode(exp);
+    }
+    emitter.emitInstruction("b", loopStart, "Repeat loop");
+    emitter.emitLabel(loopEnd);
+}
+
 
 void CodeGenerator::generateExpNode(ExpNode *node) {
     if (!node->lhs_identifier.empty()) {
