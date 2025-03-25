@@ -6,7 +6,17 @@
 #include "code-generator/CodeGenerator.hpp"
 
 int main() {
-    std::filesystem::path filePath("/Users/hemantayuj/Desktop/compiler/Groquaza/tests/sum.blu");
+    std::string path = "";
+
+    #ifdef __APPLE__
+        path = "/Users/hemantayuj/Desktop/compiler/Groquaza/src/tests/sum.blu";
+    #elif defined(__linux__)
+        path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/sum.blu";
+    #else
+        #error "Unsupported device";
+    #endif
+
+    std::filesystem::path filePath(path);
     Lexer lex(filePath);
     Parser parser(lex);
     StartNode *startNode = parser.parse();
