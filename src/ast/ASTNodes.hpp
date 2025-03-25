@@ -127,6 +127,10 @@ public:
     ComparisonNode *comparison() {
         return getChild<ComparisonNode>();
     }
+
+    LiteralNode *rhs_literal() {
+        return getChild<LiteralNode>(1);
+    }
 };
 
 class ComparisonNode: public Node {

@@ -108,13 +108,32 @@ void CodeGenerator::generateWhile(StatementNode *node) {
         std::cerr << "Error: while condition is not a binary operation" << std::endl;
         return;
     }
-    int offsetL = getVariableOffset(cond->left_identifier);
-    int offsetR = getVariableOffset(cond->right_identifier);
-    emitter.emitInstruction("ldr", "w1, [sp, #" + std::to_string(offsetL) + "]", "Load " + cond->left_identifier);
-    emitter.emitInstruction("ldr", "w2, [sp, #" + std::to_string(offsetR) + "]", "Load " + cond->right_identifier);
-    emitter.emitInstruction("cmp", "w1, w2", "Compare condition");
-   // For a while loop like "while (i <= 10)", exit if i > 10.
-    emitter.emitInstruction("b.gt", loopEnd, "Exit loop if condition false");
+    generateBinaryOpNode(cond);
+    ComparisonNode *comp = cond->comparison();
+    std::string branch = "";
+    switch (comp->comparison) {
+        case comp->GREATER_COMP:
+            branch = "b.le";
+            break;
+        case comp->GREATER_EQUAL_COMP:
+            branch = "b.lt";
+            break;
+        case comp->LESS_COMP:
+            branch = "b.ge";
+            break;
+        case comp->LESS_EQUAL_COMP:
+            branch = "b.gt";
+            break;
+        case comp->NOT_EQUAL_COMP:
+            branch = "b.eq";
+            break;
+        case comp->EQUAL_COMP:
+            branch = "b.ne";
+            break;
+        default:
+            break;
+    }
+    emitter.emitInstruction(branch, loopEnd, "Exit loop if condition false");
 
     std::vector<ExpNode*> bodyExps = node->exps();
     for (auto exp : bodyExps) {
@@ -174,8 +193,8 @@ void CodeGenerator::generateAddExpNode(AddExpNode *node) {
     if (!node->right_identifier.empty()) {
         int offset = getVariableOffset(node->right_identifier);
         emitter.emitInstruction("ldr", "w2, [sp, #" + std::to_string(offset) + "]", "Load " + node->right_identifier);
-    } else if (node->children.size() >= 2) {
-        if (auto lit = dynamic_cast<LiteralNode*>(node->children[1])) {
+    } else if (!node->children.empty()) {
+        if (auto lit = dynamic_cast<LiteralNode*>(node->children.back())) {
             emitter.emitInstruction("mov", "w2, #" + lit->value, "Load literal " + lit->value);
         }
     }
@@ -190,6 +209,10 @@ void CodeGenerator::generateBinaryOpNode(BinaryOpNode *node) {
     if (!node->right_identifier.empty()) {
         int offset = getVariableOffset(node->right_identifier);
         emitter.emitInstruction("ldr", "w2, [sp, #" + std::to_string(offset) + "]", "Load " + node->right_identifier);
+    } else if(!node->children.empty()) {
+        if (auto lit = dynamic_cast<LiteralNode*>(node->rhs_literal())) {
+            emitter.emitInstruction("mov", "w2, #" + lit->value, "Load literal " + lit->value);
+        }
     }
     emitter.emitInstruction("cmp", "w1, w2", "Compare operands");
 }

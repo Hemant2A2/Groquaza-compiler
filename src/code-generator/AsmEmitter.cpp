@@ -24,7 +24,7 @@ void AsmEmitter::emitInstruction(const std::string &mnemonic, const std::string 
         out << " " << operands;
     }
     if (!comment.empty()) {
-        out << " // " << comment;
+        out << "        // " << comment;
     }
     out << "\n";
 }
