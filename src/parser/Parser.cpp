@@ -47,7 +47,6 @@ ExpNode *Parser::parseExp() {
             default: typeStr = "unknown"; break;
         }
         Token lhs_token = lexer.getToken();
-        std::cout << "lhs_token: " << lhs_token.lexeme << std::endl;
         lexer.expect(IDENTIFIER);
         expNode->lhs_identifier = lhs_token.lexeme;
         if(!symbolTable.addSymbol(lhs_token.lexeme, typeStr)) {
@@ -60,7 +59,6 @@ ExpNode *Parser::parseExp() {
             // expNode->addChild(lit);
         } else if(lexer.getToken().type == IDENTIFIER) {
             Token rhs_token = lexer.getToken();
-            std::cout << "rhs_token: " << rhs_token.lexeme << std::endl;
             lexer.nextToken();
             Token nextToken = lexer.getToken();
             if (nextToken.type == PLUS || nextToken.type == MINUS) {
@@ -84,7 +82,6 @@ ExpNode *Parser::parseExp() {
             // expNode->addChild(lit);
         } else if(lexer.getToken().type == IDENTIFIER) {
             Token rhs_token = lexer.getToken();
-            std::cout << "rhs_token: " << rhs_token.lexeme << std::endl;
             lexer.nextToken();
             Token nextToken = lexer.getToken();
             if(nextToken.type == PLUS || nextToken.type == MINUS) {
@@ -100,7 +97,6 @@ ExpNode *Parser::parseExp() {
             // expNode->addChild(lit);
         } else {
             Token iden_token = lexer.getToken();
-            std::cout << "iden_token: " << iden_token.lexeme << std::endl;
             expNode->rhs_identifier = iden_token.lexeme;
             lexer.nextToken();
         }
@@ -113,7 +109,6 @@ AddExpNode *Parser::parseAddExp(Token lhs_token) {
     AddExpNode *addExpNode = createNode<AddExpNode>();
     addExpNode->left_identifier = lhs_token.lexeme;
     Token op_token = lexer.getToken();
-    std::cout << "op token(in add exp) " << op_token.lexeme << std::endl;
     if(op_token.type == PLUS || op_token.type == MINUS) {
         addExpNode->addOp = op_token.type == PLUS ? AddExpNode::PLUS_OP : AddExpNode::MINUS_OP;
         lexer.nextToken();
@@ -124,7 +119,6 @@ AddExpNode *Parser::parseAddExp(Token lhs_token) {
         // addExpNode->addChild(right_lit);
     } else if(lexer.getToken().type == IDENTIFIER) {
         Token rhs_token = lexer.getToken();
-        std::cout << "rhs_token:(in add exp) " << rhs_token.lexeme << std::endl;
         addExpNode->right_identifier = rhs_token.lexeme;
         lexer.nextToken();
     }
@@ -138,7 +132,6 @@ BinaryOpNode *Parser::parseBinaryOp() {
     if(left_lit != nullptr) {
         // binaryOpNode->addChild(left_lit);
     } else if(token.type == IDENTIFIER) {
-        std::cout << "left iden " << token.lexeme << std::endl;
         binaryOpNode->left_identifier = token.lexeme;
         lexer.nextToken();
     }
@@ -149,7 +142,6 @@ BinaryOpNode *Parser::parseBinaryOp() {
     if(right_lit != nullptr) {
         // binaryOpNode->addChild(right_lit);
     } else if(token.type == IDENTIFIER) {
-        std::cout << "right iden " << token.lexeme << std::endl;
         binaryOpNode->right_identifier = token.lexeme;
         lexer.nextToken();
     }
@@ -163,7 +155,6 @@ ComparisonNode *Parser::parseComparison() {
         token.type != EQUAL && token.type != NOT_EQUAL ) {
         return nullptr;
     }
-    std::cout << "comp token " << token.lexeme << std::endl;
     ComparisonNode *comparisonNode = createNode<ComparisonNode>();
 
     switch (token.type) {
@@ -198,8 +189,6 @@ KeywordNode *Parser::parseKeyword() {
     if (token.type != IF && token.type != ELSE && token.type != ELIF && token.type != WHILE) {
         return nullptr;
     }
-
-    std::cout << "keyword token: " << token.lexeme << std::endl;
     KeywordNode *keywordNode = createNode<KeywordNode>();
 
     switch (token.type) {
@@ -246,7 +235,6 @@ DataTypeNode *Parser::parseDataType() {
         default:
             break;
     }
-    std::cout << "data type token: " << token.lexeme << std::endl;
     lexer.nextToken();
     return endNode(dataTypeNode);
 }
@@ -257,7 +245,6 @@ LiteralNode *Parser::parseLiteral() {
     if (token.type != INTEGER_LIT && token.type != FLOAT_LIT && token.type != STRING_LIT) {
          return nullptr;
     }
-    std::cout << "literal token: " << token.lexeme << std::endl;
     LiteralNode *literalNode = createNode<LiteralNode>();
     literalNode->literal = (token.type == INTEGER_LIT) ? LiteralNode::INT_LITERAL :
                              (token.type == FLOAT_LIT) ? LiteralNode::FLOAT_LITERAL : LiteralNode::STRING_LITERAL;

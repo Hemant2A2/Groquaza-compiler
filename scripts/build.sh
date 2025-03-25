@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$#" -ge 1 ]; then
+    FILE_ARG="$1"
+else
+    FILE_ARG=""
+fi
+
 OS_NAME=$(uname -s)
 if [[ "$OS_NAME" == "Darwin" ]]; then
     PROJECT_DIR="/Users/hemantayuj/Desktop/compiler/Groquaza/src"
@@ -22,13 +28,17 @@ SRC_FILES="main.cpp lexer/Lexer.cpp lexer/reader/Reader.cpp lexer/reader/CodeLoc
 OUTPUT="main"
 
 cd "$PROJECT_DIR" || exit
-
-echo "Compiling..."
 $COMPILER $STD_VERSION $SRC_FILES -o $OUTPUT
 
+ASM_OUTPUT="output.s"
+
 if [ $? -eq 0 ]; then
-    echo "Compilation successful. Running program..."
-    ./$OUTPUT
+    if [ -n "$FILE_ARG" ]; then
+         ./$OUTPUT "$FILE_ARG" "$ASM_OUTPUT"
+    else
+         echo "Running program with default file."
+         ./$OUTPUT
+    fi
 else
     echo "Compilation failed."
 fi

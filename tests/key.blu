@@ -1,0 +1,10 @@
+int a = 42;
+int b = 69;
+while(a < 50) {
+	a = a + 1;
+	if (a == 47) {
+		b = b + 1;
+	}
+}
+int c = a + b;
+return c;
