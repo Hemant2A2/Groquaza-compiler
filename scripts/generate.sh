@@ -7,7 +7,7 @@ if [[ "$ARCH" != "aarch64" ]]; then
 fi
 
 PROJECT_DIR="/home/h3m/Desktop/Projects/Groquaza-compiler/src"
-TEST_FILE="sum"
+TEST_FILE="key"
 
 cd "$PROJECT_DIR" || { echo "Project directory not found"; exit 1; }
 

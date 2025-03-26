@@ -15,8 +15,10 @@ StartNode *Parser::parse() {
 
 StatementNode *Parser::parseStatement() {
     StatementNode *statementNode = createNode<StatementNode>();
-    KeywordNode *keyword = parseKeyword();
-    if(keyword != nullptr) {
+    Token tokk = lexer.getToken();
+    if(tokk.lexeme == "if" or tokk.lexeme == "else" or tokk.lexeme == "elif" 
+         or tokk.lexeme == "while") {
+        KeywordNode *keyword = parseKeyword();
         if(keyword->keyword != KeywordNode::ELSE_KEY) {
             lexer.expect(OPEN_PAREN);
             parseBinaryOp();
@@ -24,7 +26,13 @@ StatementNode *Parser::parseStatement() {
         }
         lexer.expect(OPEN_BRACE);
         while(lexer.getToken().type != CLOSE_BRACE) {
-            parseExp();
+            Token tok = lexer.getToken();
+            if(tok.lexeme == "if" or tok.lexeme == "else" or tok.lexeme == "elif" 
+                or tok.lexeme == "while") {
+                parseStatement();
+            } else {
+                parseExp();
+            }
         }
         lexer.expect(CLOSE_BRACE);
     } else {
@@ -36,7 +44,6 @@ StatementNode *Parser::parseStatement() {
 
 ExpNode *Parser::parseExp() {
     ExpNode *expNode = createNode<ExpNode>();
-
     auto dtNode = parseDataType();
     if(dtNode != nullptr) {
         std::string typeStr;

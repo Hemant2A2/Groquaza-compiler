@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
     std::string path = "";
-    std::string output = "output_sum.s";
+    std::string output = "output_key.s";
 
     if (argc > 1) {
         path = argv[1];
@@ -16,9 +16,9 @@ int main(int argc, char *argv[]) {
         }
     } else {
         #ifdef __APPLE__
-            path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/sum.blu";
+            path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/key.blu";
         #elif defined(__linux__)
-            path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/sum.blu";
+            path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/key.blu";
         #else
             #error "Unsupported device";
         #endif
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     Lexer lex(filePath);
     Parser parser(lex);
     StartNode *startNode = parser.parse();
-    // printAST(startNode);
+    printAST(startNode);
     CodeGenerator codeGen(output, parser.getSymbolTable());
     codeGen.generateAssembly(startNode);
     return 0;

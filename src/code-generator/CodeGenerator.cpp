@@ -30,13 +30,22 @@ void CodeGenerator::generateAssembly(StartNode *root) {
     std::vector<StatementNode*> stmts = root->statements();
     for (size_t i = 0; i < stmts.size(); i++) {
         StatementNode *stmt = stmts[i];
-        if (stmt->keyword() != nullptr &&
-            (stmt->keyword()->keyword == KeywordNode::IF_KEY ||
-             stmt->keyword()->keyword == KeywordNode::ELIF_KEY)) {
-            generateIfElseChain(stmts, i);
-        } else if(stmt->keyword() != nullptr &&
-                  stmt->keyword()->keyword == KeywordNode::WHILE_KEY) {
-            generateWhile(stmt);
+        if (stmt->keyword() != nullptr) {
+            switch (stmt->keyword()->keyword) {
+                case KeywordNode::IF_KEY:
+                case KeywordNode::ELIF_KEY:
+                    generateIfElseChain(stmts, i);
+                    break;
+                case KeywordNode::WHILE_KEY:
+                    generateWhile(stmt);
+                    break;
+                case KeywordNode::ELSE_KEY:
+                    generateStatementNode(stmt);
+                    break;
+                default:
+                    generateStatementNode(stmt);
+                    break;
+            }
         } else {
             generateStatementNode(stmt);
         }
@@ -54,6 +63,20 @@ void CodeGenerator::generateStartNode(StartNode *node) {
 }
 
 void CodeGenerator::generateStatementNode(StatementNode *node) {
+    size_t i = 0;
+    if (node->keyword() != nullptr) {
+        switch (node->keyword()->keyword) {
+            case KeywordNode::IF_KEY:
+            case KeywordNode::ELIF_KEY:
+                generateIfElseChain({node}, i);
+                return;
+            case KeywordNode::WHILE_KEY:
+                generateWhile(node);
+                return;
+            default:
+                break;
+        }
+    }
     if (node->exp() != nullptr) {
         generateExpNode(node->exp());
     }
@@ -72,8 +95,32 @@ void CodeGenerator::generateIfElseChain(const std::vector<StatementNode*> &stmts
     emitter.emitInstruction("ldr", "w2, [sp, #" + std::to_string(offsetR) + "]", "Load " + cond->right_identifier);
     emitter.emitInstruction("cmp", "w1, w2", "Compare condition");
     
+    ComparisonNode *comp = cond->comparison();
+    std::string branch = "";
+    switch (comp->comparison) {
+        case comp->GREATER_COMP:
+            branch = "b.le";
+            break;
+        case comp->GREATER_EQUAL_COMP:
+            branch = "b.lt";
+            break;
+        case comp->LESS_COMP:
+            branch = "b.ge";
+            break;
+        case comp->LESS_EQUAL_COMP:
+            branch = "b.gt";
+            break;
+        case comp->NOT_EQUAL_COMP:
+            branch = "b.eq";
+            break;
+        case comp->EQUAL_COMP:
+            branch = "b.ne";
+            break;
+        default:
+            break;
+    }
     std::string elseLabel = getUniqueLabel("else");
-    emitter.emitInstruction("b.eq", elseLabel, "Branch if condition false");
+    emitter.emitInstruction(branch, elseLabel, "Branch if condition false");
 
     std::vector<ExpNode*> thenExps = ifStmt->exps();
     for (auto exp : thenExps) {
@@ -135,9 +182,13 @@ void CodeGenerator::generateWhile(StatementNode *node) {
     }
     emitter.emitInstruction(branch, loopEnd, "Exit loop if condition false");
 
-    std::vector<ExpNode*> bodyExps = node->exps();
-    for (auto exp : bodyExps) {
-        generateExpNode(exp);
+    for (size_t i = 2; i < node->children.size(); i++) {
+        Node *child = node->children[i];
+        if (auto stmt = dynamic_cast<StatementNode*>(child)) {
+            generateStatementNode(stmt);
+        } else if (auto exp = dynamic_cast<ExpNode*>(child)) {
+            generateExpNode(exp);
+        }
     }
     emitter.emitInstruction("b", loopStart, "Repeat loop");
     emitter.emitLabel(loopEnd);
