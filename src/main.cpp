@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
         }
     } else {
         #ifdef __APPLE__
-        path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/sum.blu";
+            path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/sum.blu";
         #elif defined(__linux__)
             path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/sum.blu";
         #else
