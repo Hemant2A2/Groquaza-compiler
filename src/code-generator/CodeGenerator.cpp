@@ -89,12 +89,8 @@ void CodeGenerator::generateIfElseChain(const std::vector<StatementNode*> &stmts
         std::cerr << "Error: if condition is not a binary operation" << std::endl;
         return;
     }
-    int offsetL = getVariableOffset(cond->left_identifier);
-    int offsetR = getVariableOffset(cond->right_identifier);
-    emitter.emitInstruction("ldr", "w1, [sp, #" + std::to_string(offsetL) + "]", "Load " + cond->left_identifier);
-    emitter.emitInstruction("ldr", "w2, [sp, #" + std::to_string(offsetR) + "]", "Load " + cond->right_identifier);
-    emitter.emitInstruction("cmp", "w1, w2", "Compare condition");
-    
+
+    generateBinaryOpNode(cond);
     ComparisonNode *comp = cond->comparison();
     std::string branch = "";
     switch (comp->comparison) {
@@ -122,20 +118,31 @@ void CodeGenerator::generateIfElseChain(const std::vector<StatementNode*> &stmts
     std::string elseLabel = getUniqueLabel("else");
     emitter.emitInstruction(branch, elseLabel, "Branch if condition false");
 
-    std::vector<ExpNode*> thenExps = ifStmt->exps();
-    for (auto exp : thenExps) {
-        generateExpNode(exp);
+    for (size_t i = 0; i < ifStmt->children.size(); i++) {
+        Node *child = ifStmt->children[i];
+        if (auto stmt = dynamic_cast<StatementNode*>(child)) {
+            generateStatementNode(stmt);
+        } else if (auto exp = dynamic_cast<ExpNode*>(child)) {
+            generateExpNode(exp);
+        }
     }
+
     std::string endLabel = getUniqueLabel("endif");
     if (i + 1 < stmts.size() && stmts[i+1]->keyword() != nullptr &&
         stmts[i+1]->keyword()->keyword == KeywordNode::ELSE_KEY) {
         i++;
         emitter.emitInstruction("b", endLabel, "Jump to end of if");
         emitter.emitLabel(elseLabel);
-        std::vector<ExpNode*> elseExps = stmts[i]->exps();
-        for (auto exp : elseExps) {
-            generateExpNode(exp);
+
+        for (size_t j = 0; j < stmts[i]->children.size(); j++) {
+            Node *child = stmts[i]->children[j];
+            if (auto stmt = dynamic_cast<StatementNode*>(child)) {
+                generateStatementNode(stmt);
+            } else if (auto exp = dynamic_cast<ExpNode*>(child)) {
+                generateExpNode(exp);
+            }
         }
+
     }
     else {
         emitter.emitInstruction("b", endLabel, "Jump to end of if");
@@ -182,7 +189,7 @@ void CodeGenerator::generateWhile(StatementNode *node) {
     }
     emitter.emitInstruction(branch, loopEnd, "Exit loop if condition false");
 
-    for (size_t i = 2; i < node->children.size(); i++) {
+    for (size_t i = 0; i < node->children.size(); i++) {
         Node *child = node->children[i];
         if (auto stmt = dynamic_cast<StatementNode*>(child)) {
             generateStatementNode(stmt);

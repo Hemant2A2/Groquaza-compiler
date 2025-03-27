@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
     std::string path = "";
-    std::string output = "output_key.s";
+    std::string output = "output_nest.s";
 
     if (argc > 1) {
         path = argv[1];
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
         #ifdef __APPLE__
             path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/key.blu";
         #elif defined(__linux__)
-            path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/key.blu";
+            path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/nest.blu";
         #else
             #error "Unsupported device";
         #endif

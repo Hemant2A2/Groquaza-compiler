@@ -2,6 +2,7 @@
 <start> ::= <statement>* END_OF_FILE
 <statement> ::= <keyword> OPEN_PAREN <binaryOp> CLOSE_PAREN OPEN_BRACE <exp>* CLOSE_BRACE
                 | <exp>
+                | <statement>
 <exp> ::=  <dataType> IDENTIFIER ASSIGN (<literal> | IDENTIFIER | <addExp>) SEMICOLON
            | RETURN (<literal> | IDENTIFIER) SEMICOLON
            | <addExp>
