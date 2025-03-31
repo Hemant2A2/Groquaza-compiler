@@ -1,0 +1,6 @@
+fn add = (int a, int b) : int {
+    int c = a + b;
+    return c;
+};
+int ans = add(4, 5);
+print(ans);

@@ -9,8 +9,15 @@ static void printIndent(const std::string &prefix, bool isLast) {
 static std::string nodeToString(Node* node) {
     if (auto start = dynamic_cast<StartNode*>(node))
         return "StartNode";
-    else if (auto stmt = dynamic_cast<StatementNode*>(node))
-        return "StatementNode";
+    else if (auto stmt = dynamic_cast<StatementNode*>(node)) {
+        std::string result = "StatementNode";
+        switch (stmt->ofType) {
+            case StatementNode::FOR:    result += " (For)"; break;
+            case StatementNode::VECTOR: result += " (Vector)"; break;
+            default: break;
+        }
+        return result;
+    }
     else if (auto exp = dynamic_cast<ExpNode*>(node)) {
         std::string result = "ExpNode";
         if (!exp->lhs_identifier.empty())
@@ -43,8 +50,8 @@ static std::string nodeToString(Node* node) {
     else if (auto comp = dynamic_cast<ComparisonNode*>(node)) {
         std::string result = "ComparisonNode";
         switch (comp->comparison) {
-            case ComparisonNode::GREATER_COMP:         result += " (>)"; break;
-            case ComparisonNode::GREATER_EQUAL_COMP:   result += " (>=)"; break;
+            case ComparisonNode::GREATER_COMP:           result += " (>)"; break;
+            case ComparisonNode::GREATER_EQUAL_COMP:     result += " (>=)"; break;
             case ComparisonNode::LESS_COMP:              result += " (<)"; break;
             case ComparisonNode::LESS_EQUAL_COMP:        result += " (<=)"; break;
             case ComparisonNode::EQUAL_COMP:             result += " (==)"; break;
@@ -83,6 +90,26 @@ static std::string nodeToString(Node* node) {
             default: break;
         }
         result += " [Value: " + lit->value + "]";
+        return result;
+    } else if(auto vec_decl = dynamic_cast<ArrayDeclNode*>(node)) {
+        std::string result = "ArrayDeclNode";
+        result += " [Name: " + vec_decl->identifier + "]";
+        switch(vec_decl->elementType) {
+            case DataTypeNode::INT_TYPE:    result += " [Type: int]"; break;
+            case DataTypeNode::FLOAT_TYPE:  result += " [Type: float]"; break;
+            case DataTypeNode::STRING_TYPE: result += " [Type: string]"; break;
+            default: break;
+        }
+        result += " [Size: " + vec_decl->size + "]";
+        return result;
+    } else if(auto vec_index = dynamic_cast<ArrayIndexNode*>(node)) {
+        std::string result = "ArrayIndexNode";
+        result += " [Name: " + vec_index->identifier + "]";
+        if(vec_index->index_identifier.empty()) {
+            result += " [Index: " + vec_index->index_value + "]";
+        } else {
+            result += " [Index: " + vec_index->index_identifier + "]";
+        }
         return result;
     }
     return "Unknown Node";

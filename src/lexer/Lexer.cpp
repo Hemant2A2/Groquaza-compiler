@@ -5,23 +5,40 @@
 #include <assert.h>
 
 Lexer::Lexer(std::filesystem::path &filePath) : reader(filePath) {
-    nextToken();
-    // // Uncomment this to test Lexing
-    // while (getToken().type != END_OF_FILE) {
-    //     nextToken();
-    // }
+    advance();
+    while (currToken.type != END_OF_FILE) {
+        advance();
+    }
 }
 
 const Token &Lexer::getToken() const {
-    return currToken;
+    return tokens[currTokIndex];
 }
 
-void Lexer::nextToken() {
+const Token &Lexer::peekToken(size_t ahead) const {
+    if(currTokIndex + ahead >= tokens.size()) {
+        return tokens.back();
+    }
+    return tokens[currTokIndex + ahead];
+}
+
+void Lexer::advance() {
     while(isspace(reader.getChar()) && !reader.isEOF()) {
         reader.nextChar();
     }
     currToken = consumeToken();
     tokens.push_back(currToken);
+}
+
+void Lexer::backward() {
+    if(currTokIndex == 0) {
+        return;
+    }
+    currTokIndex--;
+}
+
+void Lexer::nextToken() {
+    currTokIndex++;
 }
 
 bool Lexer::isEOF() const {
@@ -98,7 +115,10 @@ Token Lexer::consumeToken() {
             return Token(TYPE_INTEGER, lexeme, reader.getCodeLoc());
         } else if(lexeme == "float") {
             return Token(TYPE_FLOAT, lexeme, reader.getCodeLoc());
-        } 
+        } else if(lexeme == "vector") {
+            inVectorDecl = true;
+            return Token(VECTOR, lexeme, reader.getCodeLoc());
+        }
         
         return Token(IDENTIFIER, lexeme, reader.getCodeLoc());
     };
@@ -144,6 +164,10 @@ Token Lexer::consumeToken() {
             return Token(OPEN_BRACE, "{", reader.getCodeLoc());
         case '}':
             return Token(CLOSE_BRACE, "}", reader.getCodeLoc());
+        case '[':
+            return Token(OPEN_BRACKET, "[", reader.getCodeLoc());
+        case ']':
+            return Token(CLOSE_BRACKET, "]", reader.getCodeLoc());
         case ',':
             return Token(COMMA, ",", reader.getCodeLoc());
         case '.':
@@ -177,11 +201,18 @@ Token Lexer::consumeToken() {
                 reader.nextChar();
                 return Token(GREATER_EQUAL, ">=", reader.getCodeLoc());
             }
+            if(inVectorDecl) {
+                inVectorDecl = false;
+                return Token(GT, ">", reader.getCodeLoc());
+            }
             return Token(GREATER, ">", reader.getCodeLoc());
         case '<':
             if(reader.getChar() == '=' && !reader.isEOF()) {
                 reader.nextChar();
                 return Token(LESS_EQUAL, "<=", reader.getCodeLoc());
+            }
+            if(inVectorDecl) {
+                return Token(LT, "<", reader.getCodeLoc());
             }
             return Token(LESS, "<", reader.getCodeLoc());
         default:

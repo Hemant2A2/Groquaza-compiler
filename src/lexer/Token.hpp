@@ -9,6 +9,8 @@ enum TokenType {
     CLOSE_PAREN,        //  )
     OPEN_BRACE,         //  {
     CLOSE_BRACE,        //  }
+    OPEN_BRACKET,       //  [
+    CLOSE_BRACKET,      //  ]
     COMMA,              //  ,
     DOT,                //  .
     SEMICOLON,          //  ;
@@ -44,6 +46,9 @@ enum TokenType {
     RETURN,             //  return
     TRUE,               //  true    
     WHILE,              //  while
+    VECTOR,             //  vector
+    LT,                 //  <
+    GT,                 //  >
     END_OF_FILE,        //  EOF
     INVALID
 };

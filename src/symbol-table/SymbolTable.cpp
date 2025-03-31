@@ -2,16 +2,26 @@
 
 SymbolTable::SymbolTable() : nextOffset(0) {}
 
-bool SymbolTable::addSymbol(const std::string &name, const std::string &type) {
+bool SymbolTable::addSymbol(const std::string &name, const std::string &type, int arraySize) {
     if (table.find(name) != table.end()) {
         return false;
     }
     SymbolInfo info;
     info.type = type;
     info.offset = nextOffset;
-    nextOffset += 4;
+    if (arraySize > 0) {
+        info.isArray = true;
+        info.arraySize = arraySize;
+        nextOffset += arraySize * 4;
+    } else {
+        nextOffset += 4;
+    }
     table[name] = info;
     return true;
+}
+
+bool SymbolTable::addSymbol(const std::string &name, const std::string &type) {
+    return addSymbol(name, type, 0);
 }
 
 bool SymbolTable::lookup(const std::string &name, SymbolInfo &info) const {

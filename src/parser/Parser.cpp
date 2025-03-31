@@ -35,11 +35,84 @@ StatementNode *Parser::parseStatement() {
             }
         }
         lexer.expect(CLOSE_BRACE);
+    } else if(tokk.lexeme == "for") {
+        statementNode->ofType = StatementNode::FOR;
+        parseForStatement();
+    } else if(tokk.lexeme == "vector") {
+        statementNode->ofType = StatementNode::VECTOR;
+        parseArrayDecl();
     } else {
         parseExp();
     }
     
     return endNode(statementNode);
+}
+
+StatementNode *Parser::parseForStatement() {
+    StatementNode *forStmt = createNode<StatementNode>();
+    lexer.expect(FOR);
+    lexer.expect(OPEN_PAREN);
+    parseExp();
+    parseBinaryOp();
+    lexer.expect(SEMICOLON);
+    parseExp();
+    lexer.expect(CLOSE_PAREN);
+    lexer.expect(OPEN_BRACE);
+    while(lexer.getToken().type != CLOSE_BRACE) {
+       parseStatement();
+    }
+    lexer.expect(CLOSE_BRACE);
+    return endNode(forStmt);
+}
+
+ArrayDeclNode *Parser::parseArrayDecl() {
+    ArrayDeclNode *arrayDecl = createNode<ArrayDeclNode>();
+    lexer.expect(VECTOR);
+    lexer.expect(LT);
+    DataTypeNode *elemType = parseDataType();
+    lexer.expect(GT);
+    Token idToken = lexer.getToken();
+    lexer.expect(IDENTIFIER);
+    arrayDecl->identifier = idToken.lexeme;
+    if (elemType) {
+        arrayDecl->elementType = elemType->dataType;
+    }
+    lexer.expect(OPEN_PAREN);
+    Token tok = lexer.getToken();
+    auto lit = parseLiteral();
+    if(lit != nullptr) {
+        arrayDecl->size = lit->value;
+    }
+    std::string typeStr;
+    switch(arrayDecl->elementType) {
+        case DataTypeNode::INT_TYPE:    typeStr = "int"; break;
+        case DataTypeNode::FLOAT_TYPE:  typeStr = "float"; break;
+        case DataTypeNode::STRING_TYPE: typeStr = "string"; break;
+        default: typeStr = "unknown"; break;
+    }
+    if(!symbolTable.addSymbol(arrayDecl->identifier, typeStr, std::stoi(arrayDecl->size))) {
+        std::cerr << "Error: Variable " << arrayDecl->identifier << " redeclared." << std::endl;
+    }
+    lexer.expect(CLOSE_PAREN);
+    lexer.expect(SEMICOLON);
+    return endNode(arrayDecl);
+}
+
+ArrayIndexNode *Parser::parseArrayIndex() {
+     ArrayIndexNode *indexNode = createNode<ArrayIndexNode>();
+    Token idToken = lexer.getToken();
+    lexer.expect(IDENTIFIER);
+    indexNode->identifier = idToken.lexeme;
+    lexer.expect(OPEN_BRACKET);
+    Token idxToken = lexer.getToken();
+    if (idxToken.type == INTEGER_LIT) {
+        indexNode->index_value = idxToken.lexeme;
+    } else if(idxToken.type == IDENTIFIER) {
+        indexNode->index_identifier = idxToken.lexeme;
+    }
+    lexer.nextToken();
+    lexer.expect(CLOSE_BRACKET);
+    return endNode(indexNode);
 }
 
 ExpNode *Parser::parseExp() {
@@ -66,13 +139,15 @@ ExpNode *Parser::parseExp() {
             // expNode->addChild(lit);
         } else if(lexer.getToken().type == IDENTIFIER) {
             Token rhs_token = lexer.getToken();
-            lexer.nextToken();
-            Token nextToken = lexer.getToken();
-            if (nextToken.type == PLUS || nextToken.type == MINUS) {
-                AddExpNode *addExp = parseAddExp(rhs_token);
-                // expNode->addChild(addExp);
-            } else {
+            Token nextToken = lexer.peekToken();
+            if(nextToken.type == PLUS || nextToken.type == MINUS) {
+                AddExpNode *addExp = parseAddExp();
+            } else if(nextToken.type == SEMICOLON) {
                 expNode->rhs_identifier = rhs_token.lexeme;
+                lexer.nextToken();
+            } else {
+                ArrayIndexNode *indexNode = parseArrayIndex();
+                expNode->rhs_identifier = indexNode->getValue();
             }
         }
     } else if(lexer.getToken().type == IDENTIFIER) {
@@ -81,20 +156,38 @@ ExpNode *Parser::parseExp() {
         if(!symbolTable.lookup(varToken.lexeme, info)) {
             std::cerr << "Error: Variable " << varToken.lexeme << " not declared." << std::endl;
         }
-        expNode->lhs_identifier = varToken.lexeme;
-        lexer.nextToken();
-        lexer.expect(ASSIGN);
-        auto lit = parseLiteral();
-        if(lit != nullptr) {
-            // expNode->addChild(lit);
-        } else if(lexer.getToken().type == IDENTIFIER) {
-            Token rhs_token = lexer.getToken();
+        Token nextTok = lexer.peekToken();
+        if(nextTok.type == OPEN_BRACKET) {
+            ArrayIndexNode *indexNode = parseArrayIndex();
+            expNode->lhs_identifier = indexNode->identifier + "[" + indexNode->getIndex() + "]";
+            lexer.expect(ASSIGN);
+            Token value_tok = lexer.getToken();
+            auto lit = parseLiteral();
+            if(lit != nullptr) {
+                indexNode->literal_value = lit->value;
+            } else if(value_tok.type == IDENTIFIER) {
+                indexNode->assigned_variable = value_tok.lexeme;
+                lexer.nextToken();
+            }
+            expNode->rhs_identifier = indexNode->getValue();
+        } else {
+            expNode->lhs_identifier = varToken.lexeme;
             lexer.nextToken();
-            Token nextToken = lexer.getToken();
-            if(nextToken.type == PLUS || nextToken.type == MINUS) {
-                AddExpNode *addExp = parseAddExp(rhs_token);
-            } else {
-                expNode->rhs_identifier = rhs_token.lexeme;
+            lexer.expect(ASSIGN);
+            auto lit = parseLiteral();
+            if(lit != nullptr) {
+                // expNode->addChild(lit);
+            } else if(lexer.getToken().type == IDENTIFIER) {
+                Token rhs_token = lexer.getToken();
+                Token nextToken = lexer.peekToken();
+                if(nextToken.type == PLUS || nextToken.type == MINUS) {
+                    AddExpNode *addExp = parseAddExp();
+                } else if(nextToken.type == SEMICOLON) {
+                    expNode->rhs_identifier = rhs_token.lexeme;
+                } else {
+                    ArrayIndexNode *indexNode = parseArrayIndex();
+                    expNode->rhs_identifier = indexNode->getValue();
+                }
             }
         }
     } else if(lexer.getToken().type == RETURN) {
@@ -112,9 +205,17 @@ ExpNode *Parser::parseExp() {
     return endNode(expNode);
 }
 
-AddExpNode *Parser::parseAddExp(Token lhs_token) {
+AddExpNode *Parser::parseAddExp() {
     AddExpNode *addExpNode = createNode<AddExpNode>();
-    addExpNode->left_identifier = lhs_token.lexeme;
+    auto left_lit = parseLiteral();
+    if(left_lit != nullptr) {
+        // addExpNode->addChild(right_lit);
+    } else if(lexer.getToken().type == IDENTIFIER) {
+        Token lhs_token = lexer.getToken();
+        addExpNode->left_identifier = lhs_token.lexeme;
+        lexer.nextToken();
+    }
+    
     Token op_token = lexer.getToken();
     if(op_token.type == PLUS || op_token.type == MINUS) {
         addExpNode->addOp = op_token.type == PLUS ? AddExpNode::PLUS_OP : AddExpNode::MINUS_OP;

@@ -14,6 +14,8 @@ class AddExpNode;
 class ComparisonNode;
 class DataTypeNode;
 class LiteralNode;
+class ArrayDeclNode;
+class ArrayIndexNode;
 
 class Node {
 public:
@@ -61,7 +63,12 @@ public:
 class StatementNode: public Node {
 public:
     using Node::Node;
-
+    enum stmtType: int {
+        NONE,
+        FOR,
+        VECTOR,
+    };
+    stmtType ofType = NONE;
     KeywordNode *keyword() {
         return getChild<KeywordNode>();
     }
@@ -185,5 +192,38 @@ public:
     };
     Literal literal = NONE_LITERAL;
     std::string value;
+};
+
+class ArrayDeclNode: public Node {
+public:
+    using Node::Node;
+    std::string identifier;
+    DataTypeNode::DataType elementType = DataTypeNode::NONE_TYPE;
+    std::string size;
+};
+
+
+class ArrayIndexNode: public Node {
+public:
+    using Node::Node;
+    std::string identifier;
+    std::string literal_value;
+    std::string assigned_variable;
+    std::string index_value;
+    std::string index_identifier;
+
+    std::string getIndex() {
+        if(index_value.empty()) {
+            return index_identifier;
+        }
+        return index_value;
+    }
+
+    std::string getValue() {
+        if(literal_value.empty()) {
+            return assigned_variable;
+        }
+        return literal_value;
+    }
 };
 

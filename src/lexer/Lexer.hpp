@@ -13,6 +13,9 @@ public:
     Lexer(std::filesystem::path &filePath);
 
     const Token &getToken() const;
+    const Token &peekToken(size_t ahead = 1) const;
+    void advance();
+    void backward();
     void nextToken();
     CodeLoc getCodeLoc() const;
     bool isEOF() const;
@@ -21,8 +24,10 @@ public:
 
 private:
     Reader reader;
+    size_t currTokIndex = 0;
     Token currToken = Token(INVALID);
     std::vector<Token> tokens;
+    bool inVectorDecl = false;
 
     Token consumeToken();
 

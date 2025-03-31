@@ -12,8 +12,11 @@ public:
 
     StartNode *parse();
     StatementNode *parseStatement();
+    StatementNode *parseForStatement();
+    ArrayDeclNode *parseArrayDecl();
+    ArrayIndexNode *parseArrayIndex();
     ExpNode *parseExp();
-    AddExpNode *parseAddExp(Token lhs_token);
+    AddExpNode *parseAddExp();
     BinaryOpNode *parseBinaryOp();
     ComparisonNode *parseComparison();
     KeywordNode *parseKeyword();
