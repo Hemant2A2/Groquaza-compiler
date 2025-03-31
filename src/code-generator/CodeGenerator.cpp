@@ -43,9 +43,10 @@ void CodeGenerator::generateAssembly(StartNode *root) {
                     generateStatementNode(stmt);
                     break;
                 default:
-                    generateStatementNode(stmt);
                     break;
             }
+        } else if(stmt->ofType == StatementNode::FOR) {
+            generateForLoop(stmt);
         } else {
             generateStatementNode(stmt);
         }
@@ -199,6 +200,62 @@ void CodeGenerator::generateWhile(StatementNode *node) {
     }
     emitter.emitInstruction("b", loopStart, "Repeat loop");
     emitter.emitLabel(loopEnd);
+}
+
+void CodeGenerator::generateForLoop(StatementNode *node) {
+    StatementNode *forStmt = node->getChild<StatementNode>();
+    if (auto initExp = dynamic_cast<ExpNode*>(forStmt->children[0])) {
+        generateExpNode(initExp);
+    }
+    std::string loopStart = getUniqueLabel("for_start");
+    std::string loopEnd = getUniqueLabel("for_end");
+    emitter.emitLabel(loopStart);
+    if (auto condOp = dynamic_cast<BinaryOpNode*>(forStmt->children[1])) {
+        generateBinaryOpNode(condOp);
+        ComparisonNode *comp = condOp->comparison();
+        std::string branchInstr;
+        if (comp) {
+            switch(comp->comparison) {
+                case ComparisonNode::LESS_EQUAL_COMP:
+                    branchInstr = "b.gt";
+                    break;
+                case ComparisonNode::LESS_COMP:
+                    branchInstr = "b.ge";
+                    break;
+                case ComparisonNode::GREATER_EQUAL_COMP:
+                    branchInstr = "b.lt";
+                    break;
+                case ComparisonNode::GREATER_COMP:
+                    branchInstr = "b.le";
+                    break;
+                case ComparisonNode::EQUAL_COMP:
+                    branchInstr = "b.ne";
+                    break;
+                case ComparisonNode::NOT_EQUAL_COMP:
+                    branchInstr = "b.eq";
+                    break;
+                default:
+                    branchInstr = "b.ne";
+                    break;
+            }
+        } else {
+            branchInstr = "b.ne";
+        }
+        emitter.emitInstruction(branchInstr, loopEnd, "Exit for loop if condition false");
+    }
+
+    for(int i = 3; i < forStmt->children.size(); i++) {
+        StatementNode *child = dynamic_cast<StatementNode*>(forStmt->children[i]);
+        generateStatementNode(child);
+    }
+
+    if (auto updateExp = dynamic_cast<ExpNode*>(forStmt->children[2])) {
+        generateExpNode(updateExp);
+    }
+    
+    emitter.emitInstruction("b", loopStart, "Repeat for loop");
+    emitter.emitLabel(loopEnd);
+
 }
 
 

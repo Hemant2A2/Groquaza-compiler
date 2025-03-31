@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
     std::string path = "";
-    std::string output = "output_vector.s";
+    std::string output = "output_for.s";
 
     if (argc > 1) {
         path = argv[1];
@@ -16,9 +16,9 @@ int main(int argc, char *argv[]) {
         }
     } else {
         #ifdef __APPLE__
-            path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/vector.blu";
+            path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/for.blu";
         #elif defined(__linux__)
-            path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/vector.blu";
+            path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/for.blu";
         #else
             #error "Unsupported device";
         #endif
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     Parser parser(lex);
     StartNode *startNode = parser.parse();
     printAST(startNode);
-    // CodeGenerator codeGen(output, parser.getSymbolTable());
-    // codeGen.generateAssembly(startNode);
+    CodeGenerator codeGen(output, parser.getSymbolTable());
+    codeGen.generateAssembly(startNode);
     return 0;
 }

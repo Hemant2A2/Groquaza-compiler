@@ -18,6 +18,7 @@ public:
 private:
     void generateStartNode(StartNode *node);
     void generateStatementNode(StatementNode *node);
+    void generateForLoop(StatementNode *node);
     void generateIfElseChain(const std::vector<StatementNode*> &stmts, size_t &i);
     void generateWhile(StatementNode *node);
     void generateExpNode(ExpNode *node);
