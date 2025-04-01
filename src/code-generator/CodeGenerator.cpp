@@ -47,6 +47,8 @@ void CodeGenerator::generateAssembly(StartNode *root) {
             }
         } else if(stmt->ofType == StatementNode::FOR) {
             generateForLoop(stmt);
+        } else if(stmt->ofType == StatementNode::VECTOR) {
+            generateArrayDeclNode(dynamic_cast<ArrayDeclNode*>(stmt->children[0]));
         } else {
             generateStatementNode(stmt);
         }
@@ -259,7 +261,70 @@ void CodeGenerator::generateForLoop(StatementNode *node) {
 }
 
 
+void CodeGenerator::generateArrayDeclNode(ArrayDeclNode *node) {
+    int baseOffset = getVariableOffset(node->identifier);
+    for (int i = 0; i < std::stoi(node->size); i++) {
+        emitter.emitInstruction("mov", "w0, #0", "Initialize " + node->identifier + "[" + std::to_string(i) + "] to 0");
+        emitter.emitInstruction("str", "w0, [sp, #" + std::to_string(baseOffset + i * 4) + "]",
+                                  "Store 0 at " + node->identifier + "[" + std::to_string(i) + "]");
+    }
+}
+
+
+void CodeGenerator::generateArrayIndexNode(ArrayIndexNode *node, bool isAssignment) {
+    int baseOffset = getVariableOffset(node->identifier);
+    std::string offsetStr;
+    bool indexInReg = false;
+    if (!node->index_value.empty()) {
+        int idx = std::stoi(node->index_value);
+        offsetStr = "#" + std::to_string(idx * 4);
+    } else if (!node->index_identifier.empty()) {
+        int idxVarOffset = getVariableOffset(node->index_identifier);
+        emitter.emitInstruction("ldr", "w1, [sp, #" + std::to_string(idxVarOffset) + "]",
+                                  "Load index from " + node->index_identifier);
+        emitter.emitInstruction("mov", "w2, #4", "Element size");
+        emitter.emitInstruction("mul", "w1, w1, w2", "Compute index offset");
+        offsetStr = "w1";
+        indexInReg = true;
+    } else {
+        offsetStr = "#0";
+    }
+    
+    emitter.emitInstruction("add", "w3, sp, #" + std::to_string(baseOffset),
+                              "Compute base address for " + node->identifier);
+    if (!indexInReg) {
+        emitter.emitInstruction("add", "w3, w3, " + offsetStr,
+                                  "Compute effective address for " + node->identifier);
+    } else {
+        emitter.emitInstruction("add", "w3, w3, " + offsetStr,
+                                  "Add register offset");
+    }
+    
+    if (!isAssignment) {
+        emitter.emitInstruction("ldr", "w0, [w3]", "Load value from " + node->identifier + " element");
+    } else {
+        emitter.emitInstruction("str", "w0, [w3]", "Store value into " + node->identifier + " element");
+    }
+}
+
+
 void CodeGenerator::generateExpNode(ExpNode *node) {
+    if (node->lhs_identifier.empty() && !node->children.empty()) {
+        if (auto arrIdx = dynamic_cast<ArrayIndexNode*>(node->children[0])) {
+            if (!node->rhs_identifier.empty()) {
+                int offset = getVariableOffset(node->rhs_identifier);
+                emitter.emitInstruction("ldr", "w0, [sp, #" + std::to_string(offset) + "]",
+                                          "Load value of " + node->rhs_identifier);
+            } else if(node->children.size() > 1) {
+                if(auto lit = dynamic_cast<LiteralNode*>(node->children[1])) {
+                    emitter.emitInstruction("mov", "w0, #" + lit->value, "Load literal " + lit->value);
+                } 
+            }
+            generateArrayIndexNode(arrIdx, true);
+            return;
+        }
+    }
+
     if (!node->lhs_identifier.empty()) {
         if (!node->children.empty()) {
             Node *rhs = findRhs(node);

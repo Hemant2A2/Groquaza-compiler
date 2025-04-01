@@ -1,22 +1,19 @@
 ```
 <start> ::= <statement>* END_OF_FILE
 
-<statement> ::= <keyword> OPEN_PAREN <binaryOp> CLOSE_PAREN 
-                    OPEN_BRACE (<exp>* | <statement>) CLOSE_BRACE
-                | FOR OPEN_PAREN <exp> <binaryOp> SEMICOLON <exp> CLOSE_PAREN
-                    OPEN_BRACE (<exp>* | <statement>* ) CLOSE_BRACE
+<statement> ::= <keyword> '(' <binaryOp> ')' '{' (<exp>* | <statement>) '}'
+                | FOR '(' <exp> <binaryOp> ';' <exp> ')' '{' (<exp>* | <statement>* ) '}'
                 | <array_decl>
                 | <exp>
                 | <statement>
 
-<exp> ::= <dataType>? IDENTIFIER ASSIGN (<literal> | IDENTIFIER | <array_index> | <addExp>) SEMICOLON
-           | RETURN (<literal> | IDENTIFIER | <array_index>) SEMICOLON
-           | <array_index> ASSIGN (<literal> | IDENTIFIER) SEMICOLON
+<exp> ::=  <dataType>? IDENTIFIER '=' (<literal> | IDENTIFIER | <array_index> | <addExp>) ';'
+           | RETURN (<literal> | IDENTIFIER | <array_index>) ';'
+           | <array_index> ASSIGN (<literal> | IDENTIFIER) ';'
 
-<array_decl> ::= VECTOR LT <dataType> GT IDENTIFIER 
-                        OPEN_PAREN (<literal> | IDENTIFIER) CLOSE_PAREN SEMICOLON
+<array_decl> ::= VECTOR '<' <dataType> '>' IDENTIFIER  '(' (<literal> | IDENTIFIER) ')' ';'
 
-<array_index> ::= IDENTIFIER OPEN_BRACKET (<literal> | IDENTIFIER) CLOSE_BRACKET 
+<array_index> ::= IDENTIFIER '[' (<literal> | IDENTIFIER) ']'
 
 <addExp> ::= (<literal> | IDENTIFIER) (PLUS | MINUS) (<literal> | IDENTIFIER)
 
