@@ -284,26 +284,26 @@ void CodeGenerator::generateArrayIndexNode(ArrayIndexNode *node, bool isAssignme
                                   "Load index from " + node->index_identifier);
         emitter.emitInstruction("mov", "w2, #4", "Element size");
         emitter.emitInstruction("mul", "w1, w1, w2", "Compute index offset");
-        offsetStr = "w1";
+        offsetStr = "x1";
         indexInReg = true;
     } else {
         offsetStr = "#0";
     }
     
-    emitter.emitInstruction("add", "w3, sp, #" + std::to_string(baseOffset),
+    emitter.emitInstruction("add", "x3, sp, #" + std::to_string(baseOffset),
                               "Compute base address for " + node->identifier);
     if (!indexInReg) {
-        emitter.emitInstruction("add", "w3, w3, " + offsetStr,
+        emitter.emitInstruction("add", "x3, x3, " + offsetStr,
                                   "Compute effective address for " + node->identifier);
     } else {
-        emitter.emitInstruction("add", "w3, w3, " + offsetStr,
+        emitter.emitInstruction("add", "x3, x3, " + offsetStr,
                                   "Add register offset");
     }
     
     if (!isAssignment) {
-        emitter.emitInstruction("ldr", "w0, [w3]", "Load value from " + node->identifier + " element");
+        emitter.emitInstruction("ldr", "w0, [x3]", "Load value from " + node->identifier + " element");
     } else {
-        emitter.emitInstruction("str", "w0, [w3]", "Store value into " + node->identifier + " element");
+        emitter.emitInstruction("str", "w0, [x3]", "Store value into " + node->identifier + " element");
     }
 }
 
@@ -333,6 +333,8 @@ void CodeGenerator::generateExpNode(ExpNode *node) {
                     emitter.emitInstruction("mov", "w0, #" + lit->value, "Load literal " + lit->value);
                 } else if (auto addExp = dynamic_cast<AddExpNode*>(rhs)) {
                     generateAddExpNode(addExp);
+                } else if(auto arrIdx = dynamic_cast<ArrayIndexNode*>(rhs)) {
+                    generateArrayIndexNode(arrIdx, false);
                 }
             }
         }
@@ -355,7 +357,8 @@ void CodeGenerator::generateExpNode(ExpNode *node) {
 
 Node* CodeGenerator::findRhs(Node *expNode) {
     for (auto child : expNode->children) {
-        if (dynamic_cast<LiteralNode*>(child) || dynamic_cast<AddExpNode*>(child))
+        if (dynamic_cast<LiteralNode*>(child) || dynamic_cast<AddExpNode*>(child)
+            || dynamic_cast<ArrayIndexNode*>(child))
             return child;
     }
     return nullptr;

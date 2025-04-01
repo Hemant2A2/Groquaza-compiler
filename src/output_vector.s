@@ -21,15 +21,18 @@ for_start_0:
     ldr w1, [sp, #20]        // Load index from i
     mov w2, #4        // Element size
     mul w1, w1, w2        // Compute index offset
-    add w3, sp, #0        // Compute base address for a
-    add w3, w3, w1        // Add register offset
-    str w0, [w3]        // Store value into a element
+    add x3, sp, #0        // Compute base address for a
+    add x3, x3, x1        // Add register offset
+    str w0, [x3]        // Store value into a element
     ldr w1, [sp, #20]        // Load i
     mov w2, #1        // Load literal 1
     add w0, w1, w2        // Compute addition
     str w0, [sp, #20]        // Store i
     b for_start_0        // Repeat for loop
 for_end_1:
+    add x3, sp, #0        // Compute base address for a
+    add x3, x3, #16        // Compute effective address for a
+    ldr w0, [x3]        // Load value from a element
     str w0, [sp, #24]        // Store ans
     ldr w0, [sp, #24]        // Load ans
     bl print_int        // Call print_int

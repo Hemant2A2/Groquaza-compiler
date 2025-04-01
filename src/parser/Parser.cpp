@@ -147,7 +147,6 @@ ExpNode *Parser::parseExp() {
                 lexer.nextToken();
             } else {
                 ArrayIndexNode *indexNode = parseArrayIndex();
-                expNode->rhs_identifier = indexNode->getValue();
             }
         }
     } else if(lexer.getToken().type == IDENTIFIER) {
@@ -159,7 +158,6 @@ ExpNode *Parser::parseExp() {
         Token nextTok = lexer.peekToken();
         if(nextTok.type == OPEN_BRACKET) {
             ArrayIndexNode *indexNode = parseArrayIndex();
-            // expNode->lhs_identifier = indexNode->identifier + "[" + indexNode->getIndex() + "]";
             lexer.expect(ASSIGN);
             Token value_tok = lexer.getToken();
             auto lit = parseLiteral();
