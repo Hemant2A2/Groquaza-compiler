@@ -13,6 +13,7 @@ public:
     char getChar() const;
     CodeLoc getCodeLoc() const;
     void nextChar();
+    void nextLine();
     bool isEOF() const;
     
 private:

@@ -414,7 +414,10 @@ void CodeGenerator::generateAddExpNode(AddExpNode *node) {
             emitter.emitInstruction("mov", "w2, #" + lit->value, "Load literal " + lit->value);
         }
     }
-    emitter.emitInstruction("add", "w0, w1, w2", "Compute addition");
+    if(node->addOp == AddExpNode::PLUS_OP)
+        emitter.emitInstruction("add", "w0, w1, w2", "Compute addition");
+    else if(node->addOp == AddExpNode::MINUS_OP)
+         emitter.emitInstruction("sub", "w0, w1, w2", "Compute subtraction");
 }
 
 void CodeGenerator::generateBinaryOpNode(BinaryOpNode *node) {

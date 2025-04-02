@@ -1,4 +1,4 @@
-// this line not execute
+// this line does not execute
 int a = 1;
 int b = 7;
 int c = b - a; // subtract

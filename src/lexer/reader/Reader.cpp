@@ -35,6 +35,15 @@ void Reader::nextChar() {
     currCodeLoc.column++;
 }
 
+void Reader::nextLine() {
+    if(isEOF()) return;
+    currCodeLoc.line++;
+    currCodeLoc.column = 0;
+    file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    currChar = file.get();
+    currCodeLoc.column++;
+}
+
 bool Reader::isEOF() const {
     return file.eof();
 }

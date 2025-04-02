@@ -1,15 +1,11 @@
 .global _start
 _start:
-    mov w0, #2        // Load literal 2
+    mov w0, #1        // Load literal 1
     str w0, [sp, #0]        // Store a
-    mov w0, #3        // Load literal 3
+    mov w0, #7        // Load literal 7
     str w0, [sp, #4]        // Store b
-    ldr w1, [sp, #0]        // Load a
-    ldr w2, [sp, #4]        // Load b
-    add w0, w1, w2        // Compute addition
-    str w0, [sp, #8]        // Store c
-    ldr w1, [sp, #8]        // Load c
-    mov w2, #10        // Load literal 10
+    ldr w1, [sp, #4]        // Load b
+    ldr w2, [sp, #0]        // Load a
     sub w0, w1, w2        // Compute subtraction
     str w0, [sp, #8]        // Store c
     ldr w0, [sp, #8]        // Load variable c

@@ -8,7 +8,7 @@ public:
     ~AsmEmitter();
 
     void emitLine(const std::string &line);
-    void emitInstruction(const std::string &mnemonic, const std::string &operands, const std::string &comment = "");
+    void emitInstruction(const std::string &code, const std::string &operands, const std::string &comment = "");
     void emitLabel(const std::string &label);
 
 private:

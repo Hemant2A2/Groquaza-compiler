@@ -27,7 +27,8 @@ void Lexer::advance() {
         reader.nextChar();
     }
     currToken = consumeToken();
-    tokens.push_back(currToken);
+    if(currToken.type != COMMENT)
+        tokens.push_back(currToken);
 }
 
 void Lexer::backward() {
@@ -99,8 +100,6 @@ Token Lexer::consumeToken() {
             return Token(FOR, lexeme, reader.getCodeLoc());
         } else if(lexeme == "while") {
             return Token(WHILE, lexeme, reader.getCodeLoc());
-        } else if(lexeme == "print") {
-            return Token(PRINT, lexeme, reader.getCodeLoc());
         } else if(lexeme == "return") {
             return Token(RETURN, lexeme, reader.getCodeLoc());
         } else if(lexeme == "true") {
@@ -183,6 +182,11 @@ Token Lexer::consumeToken() {
         case '+':
             return Token(PLUS, "+", reader.getCodeLoc());
         case '/':
+            if(reader.getChar() == '/' && !reader.isEOF()) {
+                CodeLoc loc = reader.getCodeLoc();
+                reader.nextLine();
+                return Token(COMMENT, "//", loc);
+            }
             return Token(DIV, "/", reader.getCodeLoc());
         case '*':
             return Token(MUL, "*", reader.getCodeLoc());

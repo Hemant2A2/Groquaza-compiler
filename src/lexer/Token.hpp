@@ -42,7 +42,6 @@ enum TokenType {
     IF,                 //  if
     NIL,                //  nil
     OR,                 //  or
-    PRINT,              //  print
     OUTPUT,             //  out
     INPUT,              //  inp
     LEFT_SHIFT,         //  <<
@@ -53,6 +52,7 @@ enum TokenType {
     VECTOR,             //  vector
     LT,                 //  <
     GT,                 //  >
+    COMMENT,            //  //
     END_OF_FILE,        //  EOF
     INVALID
 };

@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
     std::string path = "";
-    std::string output = "output_inp.s";
+    std::string output = "output_comment.s";
 
     if (argc > 1) {
         path = argv[1];
@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
         #ifdef __APPLE__
             path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/out.blu";
         #elif defined(__linux__)
-            path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/inp.blu";
+            path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/comment.blu";
         #else
             #error "Unsupported device";
         #endif
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     Lexer lex(filePath);
     Parser parser(lex);
     StartNode *startNode = parser.parse();
-    // printAST(startNode);
+    printAST(startNode);
     CodeGenerator codeGen(output, parser.getSymbolTable());
     codeGen.generateAssembly(startNode);
     return 0;

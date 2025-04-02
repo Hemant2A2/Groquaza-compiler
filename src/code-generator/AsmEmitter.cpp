@@ -18,8 +18,8 @@ void AsmEmitter::emitLine(const std::string &line) {
     out << line << "\n";
 }
 
-void AsmEmitter::emitInstruction(const std::string &mnemonic, const std::string &operands, const std::string &comment) {
-    out << "    " << mnemonic;
+void AsmEmitter::emitInstruction(const std::string &code, const std::string &operands, const std::string &comment) {
+    out << "    " << code;
     if (!operands.empty()) {
         out << " " << operands;
     }
