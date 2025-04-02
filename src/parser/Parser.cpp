@@ -99,7 +99,7 @@ ArrayDeclNode *Parser::parseArrayDecl() {
 }
 
 ArrayIndexNode *Parser::parseArrayIndex() {
-     ArrayIndexNode *indexNode = createNode<ArrayIndexNode>();
+    ArrayIndexNode *indexNode = createNode<ArrayIndexNode>();
     Token idToken = lexer.getToken();
     lexer.expect(IDENTIFIER);
     indexNode->identifier = idToken.lexeme;
@@ -198,10 +198,54 @@ ExpNode *Parser::parseExp() {
             expNode->rhs_identifier = iden_token.lexeme;
             lexer.nextToken();
         }
+    } else if(lexer.getToken().type == OUTPUT) {
+        parseOutput();
+    } else if(lexer.getToken().type == INPUT) {
+        parseInput();
     }
     lexer.expect(SEMICOLON);
     return endNode(expNode);
 }
+
+
+OutputNode *Parser::parseOutput() {
+    OutputNode *outputNode = createNode<OutputNode>();
+    lexer.expect(OUTPUT);
+    while(lexer.getToken().type != SEMICOLON) {
+        lexer.expect(LEFT_SHIFT);
+        auto lit = parseLiteral();
+        if(lit == nullptr) {
+            auto iden = parseIdentifier();
+            if(iden == nullptr) {
+                ArrayIndexNode *indexNode = parseArrayIndex();
+                outputNode->output_nodes.push_back(indexNode);
+            } else {
+                outputNode->output_nodes.push_back(iden);
+            }
+        } else {
+            outputNode->output_nodes.push_back(lit);
+        }
+    }
+    return endNode(outputNode);
+}
+
+
+InputNode *Parser::parseInput() {
+    InputNode *inputNode = createNode<InputNode>();
+    lexer.expect(INPUT);
+    while(lexer.getToken().type != SEMICOLON) {
+        lexer.expect(RIGHT_SHIFT);
+        auto iden = parseIdentifier();
+        if(iden == nullptr) {
+            ArrayIndexNode *indexNode = parseArrayIndex();
+            inputNode->input_nodes.push_back(indexNode);
+        } else {
+            inputNode->input_nodes.push_back(iden);
+        }     
+    }
+    return endNode(inputNode);
+}
+
 
 AddExpNode *Parser::parseAddExp() {
     AddExpNode *addExpNode = createNode<AddExpNode>();
@@ -230,6 +274,19 @@ AddExpNode *Parser::parseAddExp() {
     }
     return endNode(addExpNode);
 }
+
+
+IdentifierNode *Parser::parseIdentifier() {
+    Token token = lexer.getToken();
+    if (token.type != IDENTIFIER) {
+        return nullptr;
+    }
+    IdentifierNode *identifierNode = createNode<IdentifierNode>();
+    identifierNode->variable = token.lexeme;
+    lexer.nextToken();
+    return endNode(identifierNode);
+}
+
 
 BinaryOpNode *Parser::parseBinaryOp() {
     BinaryOpNode *binaryOpNode = createNode<BinaryOpNode>();

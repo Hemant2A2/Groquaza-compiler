@@ -43,6 +43,10 @@ enum TokenType {
     NIL,                //  nil
     OR,                 //  or
     PRINT,              //  print
+    OUTPUT,             //  out
+    INPUT,              //  inp
+    LEFT_SHIFT,         //  <<
+    RIGHT_SHIFT,        //  >>
     RETURN,             //  return
     TRUE,               //  true    
     WHILE,              //  while

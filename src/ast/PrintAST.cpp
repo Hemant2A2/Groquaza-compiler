@@ -91,7 +91,13 @@ static std::string nodeToString(Node* node) {
         }
         result += " [Value: " + lit->value + "]";
         return result;
-    } else if(auto vec_decl = dynamic_cast<ArrayDeclNode*>(node)) {
+    }
+    else if(auto iden = dynamic_cast<IdentifierNode*>(node)) {
+        std::string result = "IdentifierNode";
+        result += " [Name: " + iden->variable + "]";
+        return result;
+    }
+    else if(auto vec_decl = dynamic_cast<ArrayDeclNode*>(node)) {
         std::string result = "ArrayDeclNode";
         result += " [Name: " + vec_decl->identifier + "]";
         switch(vec_decl->elementType) {
@@ -102,7 +108,8 @@ static std::string nodeToString(Node* node) {
         }
         result += " [Size: " + vec_decl->size + "]";
         return result;
-    } else if(auto vec_index = dynamic_cast<ArrayIndexNode*>(node)) {
+    } 
+    else if(auto vec_index = dynamic_cast<ArrayIndexNode*>(node)) {
         std::string result = "ArrayIndexNode";
         result += " [Name: " + vec_index->identifier + "]";
         if(vec_index->index_identifier.empty()) {
@@ -110,6 +117,14 @@ static std::string nodeToString(Node* node) {
         } else {
             result += " [Index: " + vec_index->index_identifier + "]";
         }
+        return result;
+    } 
+    else if(auto out = dynamic_cast<OutputNode*>(node)) {
+        std::string result = "OutputNode";
+        return result;
+    } 
+    else if(auto in = dynamic_cast<InputNode*>(node)) {
+        std::string result = "InputNode";
         return result;
     }
     return "Unknown Node";

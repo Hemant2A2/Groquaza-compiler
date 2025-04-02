@@ -10,6 +10,8 @@
 <exp> ::=  <dataType>? IDENTIFIER '=' (<literal> | IDENTIFIER | <array_index> | <addExp>) ';'
            | RETURN (<literal> | IDENTIFIER | <array_index>) ';'
            | <array_index> ASSIGN (<literal> | IDENTIFIER) ';'
+           | OUTPUT ('<<' (<literal> | IDENTIFIER | <array_index>))* ';'
+           | INPUT ('>>' (IDENTIFIER | <array_index>))* ';'
 
 <array_decl> ::= VECTOR '<' <dataType> '>' IDENTIFIER  '(' (<literal> | IDENTIFIER) ')' ';'
 
@@ -23,8 +25,8 @@
 
 <keyword> ::= IF | ELIF | ELSE | WHILE
 
-<dataType> ::= TYPE_STRING | TYPE_INTEGER | TYPE_FLOAT
+<dataType> ::= TYPE_STRING | TYPE_INTEGER | TYPE_FLOAT | TYPE_CHAR
 
-<literal> ::= STRING_LIT | INTEGER_LIT | FLOAT_LIT
+<literal> ::= STRING_LIT | INTEGER_LIT | FLOAT_LIT | CHAR_LIT
 
 ```

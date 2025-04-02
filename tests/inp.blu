@@ -1,0 +1,5 @@
+int n = 0;
+inp >> n;
+int a = 1;
+n = n + a;
+out << a << n;

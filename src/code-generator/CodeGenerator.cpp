@@ -321,8 +321,12 @@ void CodeGenerator::generateExpNode(ExpNode *node) {
                 } 
             }
             generateArrayIndexNode(arrIdx, true);
-            return;
+        } else if(auto outNode = dynamic_cast<OutputNode*>(node->children[0])) {
+            generateOutputNode(outNode);
+        } else if(auto inNode = dynamic_cast<InputNode*>(node->children[0])) {
+            generateInputNode(inNode);
         }
+        return;
     }
 
     if (!node->lhs_identifier.empty()) {
@@ -351,7 +355,36 @@ void CodeGenerator::generateExpNode(ExpNode *node) {
             int offset = getVariableOffset(node->rhs_identifier);
             emitter.emitInstruction("ldr", "w0, [sp, #" + std::to_string(offset) + "]", "Load " + node->rhs_identifier);
         }
-        emitter.emitInstruction("bl", "print_int", "Call print_int");
+        // emitter.emitInstruction("bl", "print_int", "Call print_int");
+    }
+}
+
+
+void CodeGenerator::generateOutputNode(OutputNode *node) {
+    for (auto operand : node->output_nodes) {
+        if (auto lit = dynamic_cast<LiteralNode*>(operand)) {
+            emitter.emitInstruction("mov", "w0, #" + lit->value, "Load literal " + lit->value);
+        } else if (auto iden = dynamic_cast<IdentifierNode*>(operand)) {
+            int offset = getVariableOffset(iden->variable);
+            emitter.emitInstruction("ldr", "w0, [sp, #" + std::to_string(offset) + "]", "Load variable " + iden->variable);
+        } else if (auto arrIdx = dynamic_cast<ArrayIndexNode*>(operand)) {
+            generateArrayIndexNode(arrIdx, false);
+        }
+        emitter.emitInstruction("bl", "print_int", "Print operand");
+    }
+}
+
+
+void CodeGenerator::generateInputNode(InputNode *node) {
+    for (auto target : node->input_nodes) {
+        if (auto iden = dynamic_cast<IdentifierNode*>(target)) {
+            emitter.emitInstruction("bl", "read_int", "Read integer input");
+            int offset = getVariableOffset(iden->variable);
+            emitter.emitInstruction("str", "w0, [sp, #" + std::to_string(offset) + "]", "Store input into " + iden->variable);
+        } else if(auto arrIdx = dynamic_cast<ArrayIndexNode*>(target)) {
+            emitter.emitInstruction("bl", "read_int", "Read integer input");
+            // TODO
+        }
     }
 }
 

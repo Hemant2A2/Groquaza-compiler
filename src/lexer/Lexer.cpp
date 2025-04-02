@@ -118,6 +118,10 @@ Token Lexer::consumeToken() {
         } else if(lexeme == "vector") {
             inVectorDecl = true;
             return Token(VECTOR, lexeme, reader.getCodeLoc());
+        } else if(lexeme == "out") {
+            return Token(OUTPUT, lexeme, reader.getCodeLoc());
+        } else if(lexeme == "inp") {
+            return Token(INPUT, lexeme, reader.getCodeLoc());
         }
         
         return Token(IDENTIFIER, lexeme, reader.getCodeLoc());
@@ -200,6 +204,9 @@ Token Lexer::consumeToken() {
             if(reader.getChar() == '=' && !reader.isEOF()) {
                 reader.nextChar();
                 return Token(GREATER_EQUAL, ">=", reader.getCodeLoc());
+            } else if(reader.getChar() == '>' && !reader.isEOF()) {
+                reader.nextChar();
+                return Token(RIGHT_SHIFT, ">>", reader.getCodeLoc());
             }
             if(inVectorDecl) {
                 inVectorDecl = false;
@@ -210,6 +217,9 @@ Token Lexer::consumeToken() {
             if(reader.getChar() == '=' && !reader.isEOF()) {
                 reader.nextChar();
                 return Token(LESS_EQUAL, "<=", reader.getCodeLoc());
+            } else if(reader.getChar() == '<' && !reader.isEOF()) {
+                reader.nextChar();
+                return Token(LEFT_SHIFT, "<<", reader.getCodeLoc());
             }
             if(inVectorDecl) {
                 return Token(LT, "<", reader.getCodeLoc());

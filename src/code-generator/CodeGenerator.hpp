@@ -24,6 +24,8 @@ private:
     void generateIfElseChain(const std::vector<StatementNode*> &stmts, size_t &i);
     void generateWhile(StatementNode *node);
     void generateExpNode(ExpNode *node);
+    void generateOutputNode(OutputNode *node);
+    void generateInputNode(InputNode *node);
     void generateAddExpNode(AddExpNode *node);
     void generateBinaryOpNode(BinaryOpNode *node);
     int getVariableOffset(const std::string &var);

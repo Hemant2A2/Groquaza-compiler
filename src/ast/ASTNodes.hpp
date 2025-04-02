@@ -14,8 +14,11 @@ class AddExpNode;
 class ComparisonNode;
 class DataTypeNode;
 class LiteralNode;
+class IdentifierNode;
 class ArrayDeclNode;
 class ArrayIndexNode;
+class OutputNode;
+class InputNode;
 
 class Node {
 public:
@@ -194,6 +197,12 @@ public:
     std::string value;
 };
 
+class IdentifierNode: public Node {
+public:
+    using Node::Node;
+    std::string variable;
+};
+
 class ArrayDeclNode: public Node {
 public:
     using Node::Node;
@@ -225,5 +234,17 @@ public:
         }
         return literal_value;
     }
+};
+
+class OutputNode: public Node {
+public:
+    using Node::Node;
+    std::vector<Node*> output_nodes;
+};
+
+class InputNode: public Node {
+public:
+    using Node::Node;
+    std::vector<Node*> input_nodes;
 };
 

@@ -16,7 +16,10 @@ public:
     ArrayDeclNode *parseArrayDecl();
     ArrayIndexNode *parseArrayIndex();
     ExpNode *parseExp();
+    OutputNode *parseOutput();
+    InputNode *parseInput();
     AddExpNode *parseAddExp();
+    IdentifierNode *parseIdentifier();
     BinaryOpNode *parseBinaryOp();
     ComparisonNode *parseComparison();
     KeywordNode *parseKeyword();

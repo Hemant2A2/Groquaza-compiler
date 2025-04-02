@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[]) {
     std::string path = "";
-    std::string output = "output_vector.s";
+    std::string output = "output_inp.s";
 
     if (argc > 1) {
         path = argv[1];
@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
         }
     } else {
         #ifdef __APPLE__
-            path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/vector.blu";
+            path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/inp.blu";
         #elif defined(__linux__)
             path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/vector.blu";
         #else
