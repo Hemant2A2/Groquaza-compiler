@@ -2,4 +2,4 @@
 int a = 1;
 int b = 7;
 int c = b - a; // subtract
-return c;
+out << c;

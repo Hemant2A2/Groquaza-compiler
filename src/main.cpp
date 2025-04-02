@@ -16,9 +16,9 @@ int main(int argc, char *argv[]) {
         }
     } else {
         #ifdef __APPLE__
-            path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/inp.blu";
+            path = "/Users/hemantayuj/Desktop/compiler/Groquaza/tests/out.blu";
         #elif defined(__linux__)
-            path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/vector.blu";
+            path = "/home/h3m/Desktop/Projects/Groquaza-compiler/tests/inp.blu";
         #else
             #error "Unsupported device";
         #endif
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
     Lexer lex(filePath);
     Parser parser(lex);
     StartNode *startNode = parser.parse();
-    printAST(startNode);
+    // printAST(startNode);
     CodeGenerator codeGen(output, parser.getSymbolTable());
     codeGen.generateAssembly(startNode);
     return 0;

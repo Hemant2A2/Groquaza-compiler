@@ -8,4 +8,4 @@ while(a < 50) {
 	}
 }
 int c = a + b;
-return c;
+out << c;

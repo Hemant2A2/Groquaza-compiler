@@ -10,4 +10,4 @@ if(a < 30) {
 } else {
     b = b + 37;
 }
-return b;
+out << b;
